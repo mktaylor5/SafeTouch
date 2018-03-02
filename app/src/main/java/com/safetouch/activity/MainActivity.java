@@ -1,10 +1,12 @@
-package com.safetouch;
+package com.safetouch.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.safetouch.R;
 
 public class MainActivity extends AppCompatActivity {
 
