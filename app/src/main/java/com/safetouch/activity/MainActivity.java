@@ -37,9 +37,9 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.action_settings) {
-            Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
-            //Intent intent = new Intent(this, ConfigurationActivity.class);
-            //startActivity(intent);
+            //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, ConfigurationActivity.class);
+            startActivity(intent);
         }
 
         return true;
