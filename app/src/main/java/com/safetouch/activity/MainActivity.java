@@ -1,12 +1,15 @@
 package com.safetouch.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.safetouch.R;
+import com.safetouch.domain.Configuration;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,11 +30,16 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.emergency_contacts) {
+        if (id == R.id.home) {
+            Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
+        }
+        else if (id == R.id.emergency_contacts) {
             Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.action_settings) {
             Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
+            //Intent intent = new Intent(this, ConfigurationActivity.class);
+            //startActivity(intent);
         }
 
         return true;

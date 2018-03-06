@@ -16,7 +16,7 @@ public class Contact {
     @ColumnInfo(name = "ContactID")
     private int ContactID;
 
-    //Contact Id Methods
+    //ContactID Methods
     public int getContactID() { return ContactID; }
     public void setContactID(int contactID) { this.ContactID = contactID; }
 

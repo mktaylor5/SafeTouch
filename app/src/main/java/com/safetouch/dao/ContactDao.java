@@ -18,6 +18,9 @@ public interface ContactDao {
     @Insert
     long insert(Contact contact);
 
+    //@Query("SELECT * FROM contact WHERE ContactID = contactID")
+    //Contact getContactById(int contactID);
+
     @Query("SELECT * FROM contact")
     List<Contact> getAll();
 
