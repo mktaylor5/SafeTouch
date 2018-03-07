@@ -16,7 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ConfigurationActivity"></activity>
+        <activity
+            android:name=".activity.ConfigurationActivity"
+            android:label="@string/settings"
+            android:parentActivityName="com.safetouch.activity.MainActivity">
+        </activity>
         <activity
             android:name=".activity.EmergencyContacts"
             android:label="@string/emergency_contacts"
