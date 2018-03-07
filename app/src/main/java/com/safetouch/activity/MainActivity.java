@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.content.Intent;
+
+
 
 import com.safetouch.R;
 import com.safetouch.domain.Configuration;
@@ -17,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
 
     @Override
@@ -31,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.home) {
-            Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, EmergencyContacts.class));
+            //Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.emergency_contacts) {
-            Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show();
         }
         else if (id == R.id.action_settings) {
             //Toast.makeText(this, "Settings", Toast.LENGTH_SHORT).show();
@@ -45,4 +49,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
         //return super.onOptionsItemSelected(item);
     }
+
+
+
+
 }
