@@ -2,6 +2,8 @@ package com.safetouch.activity;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.view.MenuItem;
+
 import com.safetouch.R;
 
 /**
@@ -16,6 +18,17 @@ public class ConfigurationActivity extends MenuActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new PrefsFragment()).commit();
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();// go to parent activity.
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     public static class PrefsFragment extends PreferenceFragment {
