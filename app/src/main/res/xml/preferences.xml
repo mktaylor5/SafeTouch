@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:title="@string/general">
+        <SwitchPreference
+            android:key="alarm"
+            android:title="@string/switch_alarm"
+            android:defaultValue="false"
+            android:summary="@string/alarm_summary"/>
+
+        <SwitchPreference
+            android:key="button"
+            android:title="@string/switch_button"
+            android:defaultValue="false"
+            android:summary="@string/button_summary"/>
+
+        <!--TO DO: need to make the preset msg input the sms text-->
+        <EditTextPreference
+            android:key="preset_msg"
+            android:title="@string/preset_msg_title"
+            android:summary="@string/preset_msg_summary"
+            android:dialogTitle="@string/preset_msg_dialog"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/selected_mode">
+        <ListPreference
+            android:key="mode_list"
+            android:title="@string/change_mode"
+            android:summary="%s"
+            android:entries="@array/three_modes_list"
+            android:entryValues="@array/entryvalues_list_preference"
+            android:dialogTitle="@string/change_mode_dialog"
+            />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

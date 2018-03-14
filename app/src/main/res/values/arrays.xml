@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="three_modes_list">
+        <item>Personal</item>
+        <item>Medical</item>
+        <item>Parent</item>
+    </string-array>
+
+    <string-array name="entryvalues_list_preference">
+        <item>Alpha</item>
+        <item>Beta</item>
+        <item>Charlie</item>
+    </string-array>
+
+</resources>
