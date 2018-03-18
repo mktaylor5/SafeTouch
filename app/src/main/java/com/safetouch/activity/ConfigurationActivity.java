@@ -1,11 +1,8 @@
 package com.safetouch.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
+import android.preference.PreferenceFragment;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.safetouch.R;
 
@@ -18,7 +15,32 @@ public class ConfigurationActivity extends MenuActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_configuration);
-        getSupportActionBar(); // .setDisplayHomeAsUpEnabled(true);
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new PrefsFragment()).commit();
+
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();// go to parent activity.
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public static class PrefsFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+
+            addPreferencesFromResource(R.xml.preferences);
+        }
+    }
+
+
+
 }

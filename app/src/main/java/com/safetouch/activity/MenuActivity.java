@@ -30,7 +30,8 @@ public class MenuActivity extends AppCompatActivity {
             startActivity(intent);
         }
         else if (id == R.id.emergency_contacts) {
-            startActivity(new Intent(this, EmergencyContacts.class));
+            Intent intent = new Intent(this, EmergencyContacts.class);
+            startActivity(intent);
             //Toast.makeText(this, "Contacts", Toast.LENGTH_SHORT).show);
         }
         else if (id == R.id.action_settings) {
