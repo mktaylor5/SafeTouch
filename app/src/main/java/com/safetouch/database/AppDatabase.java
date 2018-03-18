@@ -3,6 +3,7 @@ package com.safetouch.database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
+import com.safetouch.dao.ConfigurationDao;
 import com.safetouch.dao.ContactDao;
 import com.safetouch.domain.Configuration;
 import com.safetouch.domain.Contact;
@@ -17,4 +18,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public static final String DB_NAME = "safetouch_db";
 
     public abstract ContactDao getContactDao();
+
+    public abstract ConfigurationDao getConfigurationDao();
 }
