@@ -32,4 +32,5 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
     // Test helpers for Room
     testImplementation "android.arch.persistence.room:testing:1.0.0"
+    implementation 'com.android.support:design:26.1.0'
 }
