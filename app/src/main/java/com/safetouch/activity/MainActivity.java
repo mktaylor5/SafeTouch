@@ -190,7 +190,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         if (requestCode == READ_SMS_PERMISSIONS_REQUEST) {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
+                // do nothing
+                //Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
             }

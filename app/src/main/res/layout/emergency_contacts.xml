@@ -14,7 +14,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_add_black_24dp"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        tools:ignore="VectorDrawableCompat" />
 
     <ListView
         android:id="@+id/contacts_listview"
