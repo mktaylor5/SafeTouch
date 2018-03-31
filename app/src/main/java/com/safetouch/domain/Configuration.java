@@ -5,6 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 import java.sql.Time;
+import java.util.Calendar;
 
 /**
  * Created by mktay on 3/5/2018.
@@ -40,11 +41,11 @@ public class Configuration {
 
     // Current Mode Column Definition
     @ColumnInfo(name = "AppMode")
-    private Mode AppMode;
+    private int AppMode;
 
     // Current Mode Methods
-    public Mode getAppMode() { return AppMode; }
-    public void setAppMode(Mode mode) { this.AppMode = mode; }
+    public int getAppMode() { return AppMode; }
+    public void setAppMode(int mode) { this.AppMode = mode; }
 
     // Check In Interval Column Definition
     @ColumnInfo(name = "CheckInInterval")
@@ -56,19 +57,19 @@ public class Configuration {
 
     // Check In Start Column Definition
     @ColumnInfo(name = "CheckInStart")
-    private Time CheckInStart;
+    private String CheckInStart;
 
     // Check In Start Methods
-    public Time getCheckInStart() { return CheckInStart; }
-    public void setCheckInStart(Time checkInStart) { this.CheckInStart = checkInStart; }
+    public String getCheckInStart() { return CheckInStart; }
+    public void setCheckInStart(String checkInStart) { this.CheckInStart = checkInStart; }
 
     // Check In End Column Definition
     @ColumnInfo(name = "CheckInEnd")
-    private Time CheckInEnd;
+    private String CheckInEnd;
 
     // Check In End Methods
-    public Time getCheckInEnd() { return CheckInEnd; }
-    public void setCheckInEnd(Time checkInEnd) { this.CheckInStart = checkInEnd; }
+    public String getCheckInEnd() { return CheckInEnd; }
+    public void setCheckInEnd(String checkInEnd) { this.CheckInStart = checkInEnd; }
 
     // PatternOne Column Definition
     @ColumnInfo(name = "PatternOne")
@@ -85,7 +86,6 @@ public class Configuration {
     // PatternTwo Methods
     public int getPatternTwo() { return PatternTwo; }
     public void setPatternTwo(int patternTwo) { this.PatternTwo = patternTwo; }
-
 
     // Override Methods
     @Override

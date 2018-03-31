@@ -1,14 +1,12 @@
 package com.safetouch.domain;
 
-// Enum for Mode value in database
-public enum Mode {
-    PERSONAL("Personal", 0),
-    PARENT("Parent", 1),
-    MEDICAL("Medical", 2);
+public enum PatternAction {
+    WARNING("Earning", 0),
+    EMERGENCY("Emergency", 1);
 
     private String stringValue;
     private int intValue;
-    Mode(String toString, int value) {
+    PatternAction(String toString, int value) {
         stringValue = toString;
         intValue = value;
     }
