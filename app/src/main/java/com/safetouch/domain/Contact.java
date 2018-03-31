@@ -11,6 +11,16 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "contact")
 public class Contact {
 
+    public Contact() {
+        IsApproved = false;
+    }
+
+    public Contact(String name, String phoneNumber) {
+        Name = name;
+        PhoneNumber = phoneNumber;
+        IsApproved= false;
+    }
+
     //ContactID Column Definition
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "ContactID")
@@ -28,7 +38,28 @@ public class Contact {
     public String getName() { return Name; }
     public void setName(String name) { this.Name = name; }
 
+    //Contact Phone Number Column Definition
+    @ColumnInfo(name = "PhoneNumber")
+    private String PhoneNumber;
+
+    //Contact Phone Methods
+    public String getPhoneNumber() { return PhoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.PhoneNumber = phoneNumber; }
+
+    //Contact IsApproved Flag
+    @ColumnInfo(name = "IsApproved")
+    private boolean IsApproved;
+
+    //Contact IsApproved Methods
+    public boolean getIsApproved() { return IsApproved; }
+    public void setIsApproved(boolean isApproved) { this.IsApproved = isApproved; }
+
+
+
+
+
+
     //Override Methods
     @Override
-    public String toString() { return Name; }
+    public String toString() { return Name + " - " + PhoneNumber; }
 }

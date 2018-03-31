@@ -57,34 +57,23 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             public void onClick(View view) {
 
                 if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-
                     return;
                 }
                 client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-
                         if(location!= null){
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
                             Toast.makeText(getApplicationContext(),"lat:"+lat+"lon:"+lon,Toast.LENGTH_SHORT).show();
                             userAddress=getAddress(getApplicationContext(),lat,lon);
                             Toast.makeText(getApplicationContext(),userAddress,Toast.LENGTH_SHORT).show();
-
                         }
-
                     }
                 });
-
             }
         });
-
-
-
     }
-
-
-
 
     private void requestPermission(){
         ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},1);
@@ -95,59 +84,33 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-
             List<Address> listAddresses = geocoder.getFromLocation(lat,lon, 1);
 
             if (listAddresses != null && listAddresses.size() > 0) {
-
                 Log.i("PlaceInfo", listAddresses.get(0).toString());
 
-
-
                 if (listAddresses.get(0).getSubThoroughfare() != null) {
-
                     address += listAddresses.get(0).getSubThoroughfare() + " ";
-
                 }
-
                 if (listAddresses.get(0).getThoroughfare() != null) {
-
                     address += listAddresses.get(0).getThoroughfare() + ", ";
-
                 }
-
                 if (listAddresses.get(0).getLocality() != null) {
-
                     address += listAddresses.get(0).getLocality() + ", ";
-
                 }
-
                 if (listAddresses.get(0).getPostalCode() != null) {
-
                     address += listAddresses.get(0).getPostalCode() + ", ";
-
                 }
-
                 if (listAddresses.get(0).getCountryName() != null) {
-
                     address += listAddresses.get(0).getCountryName();
-
                 }
-
                 Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
-
             }
-
         } catch (IOException e) {
-
             e.printStackTrace();
-
         }
         return address;
-
-
     }
-
 
     @Override
     public void onClick(View view) {

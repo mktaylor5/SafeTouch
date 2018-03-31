@@ -3,7 +3,7 @@ package com.safetouch.activity;
 /**
  * Created by Monica on 3/6/2018.
  */
-import android.arch.persistence.room.Room;
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -17,12 +17,14 @@ import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
 import com.safetouch.domain.Contact;
 
-import static com.safetouch.database.AppDatabase.DB_NAME;
-
+import java.util.List;
 
 public class EmergencyContacts extends MenuActivity {
 
-String[] dataArray = {"Sample" , "John Doe", "Jane Doe"};//Sample inputs for now. Will need to change later
+AppDatabase database;
+String[] dataArray = {"Sample" , "John Doe", "Jane Doe"};
+//Sample inputs for now. Will need to change later
+String[] dataArray2;
 
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +41,15 @@ protected void onCreate(Bundle savedInstanceState) {
         }
     });
 
+    database = AppDatabase.getInstance(EmergencyContacts.this);
+    //Contact test = new Contact("Mom", "12345");
+    //database.getContactDao().insert(test);
+
+    List<Contact> contacts = database.getContactDao().getAll();
+    Log.d("contacts list", contacts.toString());
+
     ListView listView = (ListView)findViewById(R.id.contacts_listview);
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, dataArray);
+    ArrayAdapter<Contact> adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1, contacts);
     listView.setAdapter(adapter);
 
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -62,13 +71,4 @@ protected void onCreate(Bundle savedInstanceState) {
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    public void createContact(Contact contact) {
-        // instance of database
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, DB_NAME).build();
-
-        db.getContactDao().insert(contact);
-    }
-
-
 }
