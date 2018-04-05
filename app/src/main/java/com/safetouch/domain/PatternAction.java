@@ -1,7 +1,7 @@
 package com.safetouch.domain;
 
 public enum PatternAction {
-    WARNING("Earning", 0),
+    WARNING("Warning", 0),
     EMERGENCY("Emergency", 1);
 
     private String stringValue;
