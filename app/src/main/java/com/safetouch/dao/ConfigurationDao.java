@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 //import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
+import android.arch.persistence.room.Update;
 
 import com.safetouch.domain.Configuration;
 
@@ -20,6 +21,12 @@ public interface ConfigurationDao {
 
     @Query("SELECT * FROM configuration")
     List<Configuration> getAll();
+
+    @Update
+    void UpdateConfiguration(Configuration config);
+
+    @Query("SELECT AppMode FROM configuration")
+    int getMode();
 
     // @Delete
     // void deleteContact(Configuration contact);

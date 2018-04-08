@@ -17,7 +17,6 @@ public class ConfigurationActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new PrefsFragment()).commit();
-
     }
 
     @Override
