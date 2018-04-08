@@ -88,6 +88,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         establishBluetoothConnection();
         btHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
+                Log.d(msg.obj.toString(), "msg");
                 if (msg.what == MESSAGE_READ) {
                     String readMessage;
                     try {
@@ -99,9 +100,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
                 if (msg.what == CONNECTING_STATUS) {
                     if (msg.arg1 == 1)
-                        btStatus.setText("Connected to Device: " + (String) (msg.obj));
+                        //btStatus.setText("Connected to Device: " + (String) (msg.obj));
+                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
                     else
-                        btStatus.setText("Connection Failed");
+                        //btStatus.setText("Connection Failed");
+                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
                 }
             }
         };
@@ -146,9 +149,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if (location != null) {
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
-                    Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
                     userAddress = getAddress(getApplicationContext(), lat, lon);
-                    Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -275,6 +278,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
                 String location = userAddress;
+                Log.i("location info", location);
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
