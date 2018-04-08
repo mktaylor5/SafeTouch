@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -88,7 +89,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         establishBluetoothConnection();
         btHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
-                Log.d(msg.obj.toString(), "msg");
+                //Log.d(msg.obj.toString(), "msg");
                 if (msg.what == MESSAGE_READ) {
                     String readMessage;
                     try {
@@ -108,7 +109,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
             }
         };
-
+        //btConnectedThread.run();
         // Location
         client = LocationServices.getFusedLocationProviderClient(this);
         sendLocation.setOnClickListener(new View.OnClickListener() {
@@ -218,7 +219,14 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 new Thread() {
                     public void run() {
                         boolean fail = false;
-                        String address = btAdapter.getAddress();
+                        String address = "";
+
+                        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
+                        for(BluetoothDevice device: devices){
+                            if(device.getName().equals("HC-05")){
+                                address = device.getAddress();
+                            }
+                        }
                         BluetoothDevice device = btAdapter.getRemoteDevice(address);
 
                         try {
