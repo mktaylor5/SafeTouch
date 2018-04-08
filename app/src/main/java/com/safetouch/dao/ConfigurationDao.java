@@ -28,6 +28,9 @@ public interface ConfigurationDao {
     @Query("SELECT AppMode FROM configuration")
     int getMode();
 
+    @Query("SELECT EmergencyText FROM configuration")
+    String getEmergencyMessage();
+
     // @Delete
     // void deleteContact(Configuration contact);
 }

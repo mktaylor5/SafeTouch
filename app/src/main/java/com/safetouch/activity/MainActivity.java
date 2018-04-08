@@ -80,55 +80,26 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         requestLocationPermission();
         database = AppDatabase.getInstance(MainActivity.this);
 
-        // View elements
-        // TextView myAddress = (TextView)findViewById(R.id.myaddress);
-<<<<<<< HEAD
-        button = (Button)findViewById(R.id.send_location) ;
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-
-                    return;
-                }
-                client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-
-                        if(location!= null){
-                            double lat = location.getLatitude();
-                            double lon = location.getLongitude();
-                            LatLng ll = new LatLng(lat,lon);
-                            Toast.makeText(MainActivity.this,"lat:"+ll.latitude+"lon:"+ll.longitude,Toast.LENGTH_SHORT).show();
-                            userAddress=getAddress(MainActivity.this,ll.latitude,ll.longitude);
-                            Toast.makeText(getApplicationContext(),userAddress,Toast.LENGTH_SHORT).show();
-
-                        }
-
-=======
-        sendLocation = (Button)findViewById(R.id.send_location);
-        sendEmergencyText = (Button)findViewById(R.id.send_text);
-        escortMode = (Button)findViewById(R.id.escort_mode);
+        sendLocation = (Button) findViewById(R.id.send_location);
+        sendEmergencyText = (Button) findViewById(R.id.send_text);
+        escortMode = (Button) findViewById(R.id.escort_mode);
 
         // Bluetooth
         establishBluetoothConnection();
         btHandler = new Handler() {
-            public void handleMessage(android.os.Message msg){
-                if(msg.what == MESSAGE_READ){
+            public void handleMessage(android.os.Message msg) {
+                if (msg.what == MESSAGE_READ) {
                     String readMessage;
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
                         Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
->>>>>>> b9b0efd5b7e78dc8b6873c42e1cbd363e5eb4e43
                     }
                 }
-                if(msg.what == CONNECTING_STATUS){
-                    if(msg.arg1 == 1)
-                        btStatus.setText("Connected to Device: " + (String)(msg.obj));
+                if (msg.what == CONNECTING_STATUS) {
+                    if (msg.arg1 == 1)
+                        btStatus.setText("Connected to Device: " + (String) (msg.obj));
                     else
                         btStatus.setText("Connection Failed");
                 }
@@ -139,50 +110,56 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         client = LocationServices.getFusedLocationProviderClient(this);
         sendLocation.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { sendLocation(view); }
+            public void onClick(View view) {
+                sendLocation(view);
+            }
         });
 
         // Emergency Text
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { sendSMSEmergencyText(view); }
+            public void onClick(View view) {
+                sendSMSEmergencyText(view);
+            }
         });
 
         // Escort Mode
         escortMode.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) { beginEscortMode(view); }
+            public void onClick(View view) {
+                beginEscortMode(view);
+            }
         });
     }
 
-    private void requestLocationPermission(){
-        ActivityCompat.requestPermissions(this,new String[]{ACCESS_FINE_LOCATION},1);
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 1);
     }
 
     private void sendLocation(View view) {
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                if(location!= null){
+                if (location != null) {
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
-                    Toast.makeText(getApplicationContext(),"lat:"+lat+"lon:"+lon,Toast.LENGTH_SHORT).show();
-                    userAddress=getAddress(getApplicationContext(),lat,lon);
-                    Toast.makeText(getApplicationContext(),userAddress,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
+                    userAddress = getAddress(getApplicationContext(), lat, lon);
+                    Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    private String getAddress(Context ctx,double lat,double lon){
+    private String getAddress(Context ctx, double lat, double lon) {
         String address = "";
 
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
-            List<Address> listAddresses = geocoder.getFromLocation(lat,lon, 1);
+            List<Address> listAddresses = geocoder.getFromLocation(lat, lon, 1);
 
             if (listAddresses != null && listAddresses.size() > 0) {
                 Log.i("PlaceInfo", listAddresses.get(0).toString());
@@ -229,15 +206,13 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
     public void establishBluetoothConnection() {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
-        if(btAdapter == null) {
+        if (btAdapter == null) {
             //Show a message that the device has no bluetooth adapter
             Toast.makeText(getApplicationContext(), "Bluetooth not available on this device.", Toast.LENGTH_LONG).show();
-            finish();
-        }
-        else {
+            //finish();
+        } else {
             if (btAdapter.isEnabled()) {
-                new Thread()
-                {
+                new Thread() {
                     public void run() {
                         boolean fail = false;
                         String address = btAdapter.getAddress();
@@ -263,15 +238,14 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                                 Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        if(fail == false) {
+                        if (fail == false) {
                             btConnectedThread = new ConnectedThread(btSocket);
                             btConnectedThread.start();
                             btHandler.obtainMessage(CONNECTING_STATUS, 1, -1, device.getName()).sendToTarget();
                         }
                     }
                 }.start();
-            }
-            else {
+            } else {
                 //Ask to the user turn the bluetooth on
                 //Toast.makeText(this, "Bluetooth device not available", Toast.LENGTH_LONG).show();
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -285,13 +259,14 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             final Method m = device.getClass().getMethod("createRfcommSocketToServiceRecord", UUID.class);
             return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
         } catch (Exception e) {
-            Log.e(TAG, "Could not create RFComm Connection",e);
+            Log.e(TAG, "Could not create RFComm Connection", e);
         }
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
     public void sendSMSEmergencyText(View view) {
-        List<Contact> contacts = database.getContactDao().getAll(); //Arrays.asList("123",  "456", "789");
+        List<Contact> contacts = database.getContactDao().getAll();
+        String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
         try {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
@@ -299,8 +274,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             } else {
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
+                String location = userAddress;
                 for (Contact contact : contacts) {
-                    String message = "Hello from SafeTouch! " + contact.getPhoneNumber();
+                    String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
@@ -338,7 +314,6 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     private void beginEscortMode(View view) {
 
     }
-
 
     private class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
@@ -398,11 +373,4 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             } catch (IOException e) { }
         }
     }
-
-
-
-
-
 }
-
-

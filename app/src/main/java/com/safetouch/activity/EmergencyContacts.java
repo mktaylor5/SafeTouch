@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -81,7 +82,10 @@ public class EmergencyContacts extends MenuActivity {
                         .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                database.getContactDao().updateContact(contacts.get(position));
+                                //database.getContactDao().updateContact(contacts.get(position));
+                                Contact current = contacts.get(position);
+                                Log.d("contact", current.toString());
+                                database.getContactDao().updateContact(current.getContactID(), current.getName(), current.getPhoneNumber());
                                 finish();
                                 startActivity(getIntent());
                             }
