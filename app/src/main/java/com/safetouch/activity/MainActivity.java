@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.safetouch.R;
 
@@ -67,8 +68,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                         if(location!= null){
                             double lat = location.getLatitude();
                             double lon = location.getLongitude();
-                            Toast.makeText(getApplicationContext(),"lat:"+lat+"lon:"+lon,Toast.LENGTH_SHORT).show();
-                            userAddress=getAddress(getApplicationContext(),lat,lon);
+                            LatLng ll = new LatLng(lat,lon);
+                            Toast.makeText(MainActivity.this,"lat:"+ll.latitude+"lon:"+ll.longitude,Toast.LENGTH_SHORT).show();
+                            userAddress=getAddress(MainActivity.this,ll.latitude,ll.longitude);
                             Toast.makeText(getApplicationContext(),userAddress,Toast.LENGTH_SHORT).show();
 
                         }
