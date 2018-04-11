@@ -8,9 +8,9 @@
     </string-array>
 
     <string-array name="entryvalues_list_preference">
-        <item>Alpha</item>
-        <item>Beta</item>
-        <item>Charlie</item>
+        <item>Personal</item>
+        <item>Medical</item>
+        <item>Parent</item>
     </string-array>
 
 </resources>

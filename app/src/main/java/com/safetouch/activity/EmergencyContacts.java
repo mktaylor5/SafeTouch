@@ -82,10 +82,8 @@ public class EmergencyContacts extends MenuActivity {
                         .setPositiveButton("Submit", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                //database.getContactDao().updateContact(contacts.get(position));
                                 Contact current = contacts.get(position);
-                                Log.d("contact", current.toString());
-                                database.getContactDao().updateContact(current.getContactID(), current.getName(), current.getPhoneNumber());
+                                database.getContactDao().updateContact(current.getContactID(), nameInput.getText().toString(),numberInput.getText().toString());
                                 finish();
                                 startActivity(getIntent());
                             }

@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.preference.EditTextPreference;
 import android.content.SharedPreferences;
+import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
+import android.preference.SwitchPreference;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -48,7 +50,8 @@ public class ConfigurationActivity extends MenuActivity {
         private Activity mActivity;
         AppDatabase database;
 
-        public static void setDefaults(String key, String value, Context context) {//set to be able to get in other activities
+        //set to be able to get EditText and List Preferences in other activities
+        public static void setDefaults(String key, String value, Context context) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);
@@ -76,6 +79,56 @@ public class ConfigurationActivity extends MenuActivity {
                     EditTextPreference editPref = (EditTextPreference)preference;//save preference
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
+                    return false;
+                }
+            });
+
+            final ListPreference mode = (ListPreference) getPreferenceScreen().findPreference("mode_list");
+            mode.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new mode entered
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String newMessage = o.toString();
+                    setDefaults("mode_list",newMessage,mContext);
+
+                    ListPreference editPref = (ListPreference) preference;//saves new mode
+                    editPref.setSummary(newMessage);
+                    editPref.setValue(newMessage);
+                    return false;
+                }
+            });
+
+            //to get SwitchPreference in other activities:
+            //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getsApplicationContext());
+            //boolean test = sharedPreferences.getBoolean("key", false);
+
+            final SwitchPreference buttonOnOff = (SwitchPreference) getPreferenceScreen().findPreference("button");
+            buttonOnOff.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//turn on off button
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    SwitchPreference editPref = (SwitchPreference) preference;//for saving
+                    if(buttonOnOff.isChecked()){
+                        editPref.setSummary("OFF");
+                        editPref.setChecked(false);
+                    }else{
+                        editPref.setSummary("ON");
+                        editPref.setChecked(true);
+                    }
+                    return false;
+                }
+            });
+
+            final SwitchPreference alarmOnOff = (SwitchPreference) getPreferenceScreen().findPreference("alarm");
+            alarmOnOff.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//turn on off alarm
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    SwitchPreference editPref = (SwitchPreference) preference;//for saving
+                    if(alarmOnOff.isChecked()){
+                        editPref.setSummary("OFF");
+                        editPref.setChecked(false);
+                    }else{
+                        editPref.setSummary("ON");
+                        editPref.setChecked(true);
+                    }
                     return false;
                 }
             });
