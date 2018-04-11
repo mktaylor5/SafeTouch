@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -18,6 +19,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -34,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
+import com.safetouch.domain.Configuration;
 import com.safetouch.domain.Contact;
 
 import java.io.IOException;
@@ -275,18 +278,24 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
     }
 
+    public static String getDefaults(String key, Context context) {//to get string from settings
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return preferences.getString(key, null);
+    }
+
     public void sendSMSEmergencyText(View view) {
         List<Contact> contacts = database.getContactDao().getAll();
-        String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
+        //String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
+        String emergencyMessage = "";
         try {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
                 getPermissionToReadSMS();
             } else {
+                emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
                 String location = userAddress;
-                Log.i("location info", location);
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
