@@ -118,7 +118,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         sendLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendLocation(view);
+                sendLocation();
             }
         });
 
@@ -143,7 +143,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 1);
     }
 
-    private void sendLocation(View view) {
+
+    //this sendLocation method should be called before getting the useraddress
+
+    private void sendLocation() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -153,8 +156,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if (location != null) {
                     double lat = location.getLatitude();
                     double lon = location.getLongitude();
+                    LatLng ll = new LatLng(lat,lon);
                     //Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
-                    userAddress = getAddress(getApplicationContext(), lat, lon);
+                    userAddress = getAddress(getApplicationContext(),ll.latitude,ll.longitude);
                     //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
                 }
             }
@@ -295,6 +299,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
+                sendLocation();
                 String location = userAddress;
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
@@ -311,7 +316,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Allow SMS send permissions", Toast.LENGTH_SHORT).show();
+            //testing to see if the useraddress is null
+            sendLocation();
+            Toast.makeText(this, "Allow SMS send permissions\n"+userAddress, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -322,7 +329,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // do nothing
-                //Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, "Read SMS permission granted\n"+userAddress, Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
             }
