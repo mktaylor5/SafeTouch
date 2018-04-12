@@ -97,7 +97,12 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     String readMessage;
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
-                        Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+                        if (readMessage != null)
+                        {
+                            // Sends text and location information
+                            sendSMSEmergencyText();
+                        }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
@@ -126,7 +131,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendSMSEmergencyText(view);
+                sendSMSEmergencyText();
             }
         });
 
@@ -287,7 +292,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         return preferences.getString(key, null);
     }
 
-    public void sendSMSEmergencyText(View view) {
+    public void sendSMSEmergencyText() {
         List<Contact> contacts = database.getContactDao().getAll();
         //String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
         String emergencyMessage = "";
