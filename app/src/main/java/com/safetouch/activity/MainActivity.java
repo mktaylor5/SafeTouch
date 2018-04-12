@@ -55,7 +55,8 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
-    private Button sendLocation, sendEmergencyText, escortMode;
+    private Button sendEmergencyText, escortMode;
+    //private Button sendLocation;
     private String userAddress;
     AppDatabase database;
 
@@ -84,7 +85,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         requestLocationPermission();
         database = AppDatabase.getInstance(MainActivity.this);
 
-        sendLocation = (Button) findViewById(R.id.send_location);
+        //sendLocation = (Button) findViewById(R.id.send_location);
         sendEmergencyText = (Button) findViewById(R.id.send_text);
         escortMode = (Button) findViewById(R.id.escort_mode);
 
@@ -120,12 +121,12 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         //btConnectedThread.run();
         // Location
         client = LocationServices.getFusedLocationProviderClient(this);
-        sendLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sendLocation();
-            }
-        });
+//        sendLocation.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                sendLocation();
+//            }
+//        });
 
         // Emergency Text
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
