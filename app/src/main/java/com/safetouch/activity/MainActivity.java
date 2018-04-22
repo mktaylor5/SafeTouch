@@ -55,7 +55,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
-    private Button sendEmergencyText, escortMode;
+    private Button sendEmergencyText, escortMode, sendFalseAlarm;
     //private Button sendLocation;
     private String userAddress;
     AppDatabase database;
@@ -88,6 +88,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         //sendLocation = (Button) findViewById(R.id.send_location);
         sendEmergencyText = (Button) findViewById(R.id.send_text);
         escortMode = (Button) findViewById(R.id.escort_mode);
+        sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
 
         // Bluetooth
         establishBluetoothConnection();
@@ -133,6 +134,14 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             @Override
             public void onClick(View view) {
                 sendSMSEmergencyText();
+            }
+        });
+
+        // False Alarm Text
+        sendFalseAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sendFalseAlarmText();
             }
         });
 
@@ -309,6 +318,25 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 String location = userAddress;
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
+                    smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
+                }
+                Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception ex) {
+            Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            ex.printStackTrace();
+        }
+    }
+
+    public void sendFalseAlarmText() {
+        List<Contact> contacts = database.getContactDao().getAll();
+        try {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                getPermissionToReadSMS();
+            } else {
+                for (Contact contact : contacts) {
+                    String message = "From SafeTouch: The last text was a result of a unintentional button press. Please ignore.";
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
