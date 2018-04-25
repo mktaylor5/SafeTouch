@@ -1,7 +1,11 @@
 package com.safetouch.activity;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.preference.EditTextPreference;
 import android.content.SharedPreferences;
 import android.preference.ListPreference;
@@ -10,13 +14,21 @@ import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.preference.SwitchPreference;
+import android.support.v7.preference.PreferenceFragmentCompat;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
-import com.safetouch.domain.Configuration;
+import com.safetouch.receiver.AlarmNotificationReceiver;
+
+import java.util.Calendar;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
+//import com.safetouch.domain.Configuration;
+//import com.safetouch.preference.TimePreference;
+//import com.safetouch.preference.TimePreferenceDialogFragmentCompat;
 
 /**
  * Created by mktay on 3/5/2018.
@@ -45,7 +57,7 @@ public class ConfigurationActivity extends MenuActivity {
         }
     }
 
-    public static class PrefsFragment extends PreferenceFragment{
+    public static class PrefsFragment extends PreferenceFragment {
         private Context mContext;
         private Activity mActivity;
         AppDatabase database;
@@ -65,6 +77,8 @@ public class ConfigurationActivity extends MenuActivity {
             mContext = this.getActivity();
             mActivity = this.getActivity();
 
+            //Preference checkInInterval = findPreference(getString(R.string.))
+
             final EditTextPreference msg = (EditTextPreference) getPreferenceScreen().findPreference("preset_msg");
             msg.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new preset msg entered
                 @Override
@@ -74,9 +88,9 @@ public class ConfigurationActivity extends MenuActivity {
                     //con.setEmergencyText(newMessage);
                     //database.getConfigurationDao().insert(con);
 
-                    setDefaults("preset_msg",newMessage,mContext);
+                    setDefaults("preset_msg", newMessage, mContext);
 
-                    EditTextPreference editPref = (EditTextPreference)preference;//save preference
+                    EditTextPreference editPref = (EditTextPreference) preference;//save preference
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
                     return false;
@@ -88,11 +102,74 @@ public class ConfigurationActivity extends MenuActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     String newMessage = o.toString();
-                    setDefaults("mode_list",newMessage,mContext);
+                    setDefaults("mode_list", newMessage, mContext);
 
                     ListPreference editPref = (ListPreference) preference;//saves new mode
                     editPref.setSummary(newMessage);
                     editPref.setValue(newMessage);
+                    return false;
+                }
+            });
+
+            final EditTextPreference startTime = (EditTextPreference) getPreferenceScreen().findPreference("checkin_start");
+            startTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new preset msg entered
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String newMessage = o.toString();
+                    //Configuration con = new Configuration();
+                    //con.setCheckInStart(newMessage);
+                    //database.getConfigurationDao().insert(con);
+
+                    setDefaults("checkin_start", newMessage, mContext);
+
+                    EditTextPreference editPref = (EditTextPreference) preference;//save preference
+                    editPref.setSummary(newMessage);
+                    editPref.setText(newMessage);
+
+                    setRecurringAlarms(mContext);
+
+                    return false;
+                }
+            });
+
+            final EditTextPreference endTime = (EditTextPreference) getPreferenceScreen().findPreference("checkin_end");
+            endTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new preset msg entered
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String newMessage = o.toString();
+                    //Configuration con = new Configuration();
+                    //con.setCheckInStart(newMessage);
+                    //database.getConfigurationDao().insert(con);
+
+                    setDefaults("checkin_end", newMessage, mContext);
+
+                    EditTextPreference editPref = (EditTextPreference) preference;//save preference
+                    editPref.setSummary(newMessage);
+                    editPref.setText(newMessage);
+
+                    setRecurringAlarms(mContext);
+
+                    return false;
+                }
+            });
+
+            final EditTextPreference interval = (EditTextPreference) getPreferenceScreen().findPreference("checkin_interval");
+            interval.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new preset msg entered
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    String newMessage = o.toString();
+                    //Configuration con = new Configuration();
+                    //con.setCheckInStart(newMessage);
+                    //database.getConfigurationDao().insert(con);
+
+                    setDefaults("checkin_interval", newMessage, mContext);
+
+                    EditTextPreference editPref = (EditTextPreference) preference;//save preference
+                    editPref.setSummary(newMessage);
+                    editPref.setText(newMessage);
+
+                    setRecurringAlarms(mContext);
+
                     return false;
                 }
             });
@@ -106,10 +183,10 @@ public class ConfigurationActivity extends MenuActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     SwitchPreference editPref = (SwitchPreference) preference;//for saving
-                    if(buttonOnOff.isChecked()){
+                    if (buttonOnOff.isChecked()) {
                         editPref.setSummary("OFF");
                         editPref.setChecked(false);
-                    }else{
+                    } else {
                         editPref.setSummary("ON");
                         editPref.setChecked(true);
                     }
@@ -122,17 +199,40 @@ public class ConfigurationActivity extends MenuActivity {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object o) {
                     SwitchPreference editPref = (SwitchPreference) preference;//for saving
-                    if(alarmOnOff.isChecked()){
+                    if (alarmOnOff.isChecked()) {
                         editPref.setSummary("OFF");
                         editPref.setChecked(false);
-                    }else{
+                    } else {
                         editPref.setSummary("ON");
                         editPref.setChecked(true);
                     }
                     return false;
                 }
             });
+
+        }
+
+        private void setRecurringAlarms(Context context) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String start = sharedPreferences.getString("checkin_start", "9:00");
+            String hour = start.substring(0, start.indexOf(":"));
+            String minute = start.substring(start.indexOf(":")+1);
+            String interval = sharedPreferences.getString("checkin_interval", "120");
+            long intervalMilli = TimeUnit.MINUTES.toMillis(Integer.parseInt(interval));
+
+            Calendar updateTime = Calendar.getInstance();
+            updateTime.setTimeZone(TimeZone.getTimeZone("CDT"));
+            updateTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+            updateTime.set(Calendar.MINUTE, Integer.parseInt(minute));
+
+            Intent downloader = new Intent(context, AlarmNotificationReceiver.class);
+            PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager alarms = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            assert alarms != null;
+            alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                    updateTime.getTimeInMillis(),
+                    intervalMilli,
+                    recurringNotification);
         }
     }
-
 }

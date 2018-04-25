@@ -33,6 +33,13 @@
             android:label="@string/emergency_contacts"
             android:parentActivityName="com.safetouch.activity.MainActivity">
         </activity>
+        <activity
+            android:name=".activity.MedicalModeActivity"
+            android:label="Medical Mode"
+            android:parentActivityName="com.safetouch.activity.MainActivity">
+        </activity>
+
+        <receiver android:name=".receiver.AlarmNotificationReceiver" />
     </application>
 
 </manifest>
