@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.safetouch">
 
-    <!--App Permissions-->
+    <!-- App Permissions -->
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -15,8 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/NoAnimTheme">
-        <activity
-            android:name="com.safetouch.activity.MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,8 +25,7 @@
         <activity
             android:name=".activity.ConfigurationActivity"
             android:label="@string/settings"
-            android:parentActivityName="com.safetouch.activity.MainActivity">
-        </activity>
+            android:parentActivityName=".activity.MainActivity"></activity>
         <activity
             android:name=".activity.EmergencyContacts"
             android:label="@string/emergency_contacts"

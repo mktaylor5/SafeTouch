@@ -2,14 +2,17 @@ package com.safetouch.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -17,6 +20,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -24,9 +28,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
+import android.text.InputType;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -146,12 +154,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         });
 
         // Escort Mode
-        escortMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                beginEscortMode(view);
-            }
-        });
+        EscortMode();
+
     }
 
     private void requestLocationPermission() {
@@ -372,10 +376,87 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
+    public boolean verifyPin(String input){
+        String pin = getDefaults("pin",getApplicationContext());
+        if(pin.equals(input)){
+            return true;
+        }
+        return false;
+    }
+    public void pinDialog(final CountDownTimer timer){//dialog shown when button unpressed
+        LinearLayout layout = new LinearLayout(MainActivity.this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final EditText numberInput = new EditText(MainActivity.this);
+        numberInput.setInputType(InputType.TYPE_CLASS_PHONE);
+        layout.addView(numberInput);
 
-    private void beginEscortMode(View view) {
+        final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setView(layout)
+                .setPositiveButton("SUBMIT", null)
+                .setNegativeButton("CLOSE", null)
+                .setTitle("Enter PIN to disable.")
+                .setMessage("Or hold down button again to continue.")
+                .show();
+
+        Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        b.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                if(verifyPin(numberInput.getText().toString()) == true) {
+                    timer.cancel();//stop timer
+                    finish();
+                    startActivity(getIntent());
+                }else{//wrong pin
+                    numberInput.setError("Wrong PIN");
+                }
+            }
+        });
+    }
+    boolean isRunning = false;
+    CountDownTimer timer;
+    @SuppressLint("ClickableViewAccessibility")
+    private void EscortMode() {
+        final Button button = findViewById(R.id.escort_mode);
+            button.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                    boolean escortPref = sharedPreferences.getBoolean("escort", false);
+                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                        button.setText("Button Pressed");
+                        if (escortPref == false) {//check if mode in on
+                            Toast.makeText(getApplicationContext(), "Turn escort mode on in settings", Toast.LENGTH_SHORT).show();
+                            button.setText("Escort Mode");
+                        }
+                        else if(isRunning == true){//stop timer
+                            timer.cancel();
+                            isRunning=false;
+                        }
+                    }if (event.getAction() == MotionEvent.ACTION_UP && escortPref == true && isRunning == false) {
+                                button.setText("Button UnPressed!");
+                                timer = new CountDownTimer(30000, 1000) {//30 seconds
+                                public void onTick(long millisUntilFinished) {
+                                    isRunning = true;
+                                }
+                                public void onFinish() {
+                                    //Toast.makeText(getApplicationContext(), "timer done!", Toast.LENGTH_SHORT).show();
+                                    isRunning=false;
+                                    sendSMSEmergencyText();
+                                    finish();
+                                    startActivity(getIntent());
+                                }
+
+                            }.start();
+                        pinDialog(timer);
+                    }
+                    return true;
+                }
+            });
+        }
 
     }
+
+
 
 //    private class ConnectedThread extends Thread {
 //        private final BluetoothSocket mmSocket;
@@ -435,4 +516,3 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 //            } catch (IOException e) { }
 //        }
 //    }
-}
