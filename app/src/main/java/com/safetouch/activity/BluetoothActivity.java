@@ -42,7 +42,7 @@ public class BluetoothActivity extends AppCompatActivity {
     @SuppressLint("HandlerLeak")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
         //requestLocationPermission();
         //database = AppDatabase.getInstance(MainActivity.this);
 

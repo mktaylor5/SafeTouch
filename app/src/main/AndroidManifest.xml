@@ -29,7 +29,19 @@
         <activity
             android:name=".activity.EmergencyContacts"
             android:label="@string/emergency_contacts"
+<<<<<<< HEAD
             android:parentActivityName=".activity.MainActivity"></activity>
+=======
+            android:parentActivityName="com.safetouch.activity.MainActivity">
+        </activity>
+        <activity
+            android:name=".activity.MedicalModeActivity"
+            android:label="Medical Mode"
+            android:parentActivityName="com.safetouch.activity.MainActivity">
+        </activity>
+
+        <receiver android:name=".receiver.AlarmNotificationReceiver" />
+>>>>>>> a6e6fbcc61ac69458bbf6fd6c0865af7737cdc68
     </application>
 
 </manifest>

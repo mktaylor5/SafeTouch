@@ -51,4 +51,29 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="Check-In">
+        <EditTextPreference
+            android:key="checkin_start"
+            android:title="Check-In Start Time"
+            android:summary="Start Time"
+            android:dialogTitle="Check-In Start Time"
+            />
+
+        <EditTextPreference
+            android:key="checkin_end"
+            android:title="Check-In End Time"
+            android:summary="End Time"
+            android:dialogTitle="Check-In End Time"
+            />
+
+        <EditTextPreference
+            android:key="checkin_interval"
+            android:title="Check-In Interval"
+            android:summary="Interval (in minutes)"
+            android:dialogTitle="Check-In Interval"
+            />
+
+    </PreferenceCategory>
+
 </PreferenceScreen>
