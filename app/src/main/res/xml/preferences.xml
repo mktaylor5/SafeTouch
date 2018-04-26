@@ -14,12 +14,26 @@
             android:defaultValue="false"
             android:summary="@string/button_summary"/>
 
-        <!--TO DO: need to make the preset msg input the sms text-->
+        <SwitchPreference
+            android:key="escort"
+            android:title="@string/escort"
+            android:defaultValue="false"
+            android:summary="@string/escort_summary"/>
+
         <EditTextPreference
             android:key="preset_msg"
             android:title="@string/preset_msg_title"
             android:summary="@string/preset_msg_summary"
             android:dialogTitle="@string/preset_msg_dialog"
+            />
+
+        <EditTextPreference
+            android:key="pin"
+            android:title="@string/pin_title"
+            android:summary="@string/pin_summary"
+            android:dialogTitle="@string/pin_dialog"
+            android:inputType="numberDecimal"
+            android:digits="0123456789"
             />
 
     </PreferenceCategory>

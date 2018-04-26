@@ -1,7 +1,9 @@
 package com.safetouch.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.preference.EditTextPreference;
 import android.content.SharedPreferences;
 import android.preference.ListPreference;
@@ -57,6 +59,7 @@ public class ConfigurationActivity extends MenuActivity {
             editor.putString(key, value);
             editor.commit();
         }
+
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -132,7 +135,39 @@ public class ConfigurationActivity extends MenuActivity {
                     return false;
                 }
             });
+
+            final SwitchPreference escortOnOFF = (SwitchPreference) getPreferenceScreen().findPreference("escort");
+            escortOnOFF.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//turn on off button
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object o) {
+                    SwitchPreference editPref = (SwitchPreference) preference;//for saving
+                    if(escortOnOFF.isChecked()){
+                        editPref.setSummary("OFF");
+                        editPref.setChecked(false);
+                    }else{//show dialog that escort mode is on
+                        editPref.setSummary("ON");
+                        editPref.setChecked(true);
+                        AlertDialog.Builder builder1 = new AlertDialog.Builder(mContext);
+                        builder1.setMessage("Hold down button to start. Once the button pressed, it must be held down until correct pin entered or " +
+                                "else contacts will be notified in 30 seconds. ")
+                                .setCancelable(false)
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mActivity.finish();
+                                        startActivity(mActivity.getParentActivityIntent());//sends to home page
+                                    }
+                                });
+                        AlertDialog alert = builder1.create();
+                        alert.setTitle("Escort Mode Turned ON.");
+                        alert.show();
+
+                    }
+                    return false;
+                }
+            });
         }
     }
+
 
 }
