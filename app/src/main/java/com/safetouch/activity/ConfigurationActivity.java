@@ -27,6 +27,10 @@ import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
 import com.safetouch.receiver.AlarmNotificationReceiver;
 
+import java.sql.Date;
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -278,11 +282,33 @@ public class ConfigurationActivity extends MenuActivity {
             PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarms = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
-            @SuppressLint({"NewApi", "LocalSuppress"}) DateTimeFormatter f = DateTimeFormatter.ofPattern("hh:mm a");
-            @SuppressLint({"NewApi", "LocalSuppress"}) LocalTime start = LocalTime.parse(startHour+":"+startMinute+" "+startPeriod, f);
-            @SuppressLint({"NewApi", "LocalSuppress"}) LocalTime end = LocalTime.parse(endHour+":"+endMinute+" "+endPeriod, f);
-            @SuppressLint({"NewApi", "LocalSuppress"}) long duration = Duration.between(start, end).toMinutes();
-            int iterations = (int)duration/interval;
+            SimpleDateFormat f = new SimpleDateFormat("hh:mm aa");
+            long min = 0;
+            long difference;
+            try {
+                Date test1 = (Date) f.parse("1:00 PM");
+                Date test2 = (Date) f.parse("2:00 PM");
+                difference = (test2.getTime() - test1.getTime()) / 1000;
+                long hours = difference % (24 * 3600) / 3600; // Calculating Hours
+                long minute = difference % 3600 / 60; // Calculating minutes if there is any minutes difference
+                min = minute + (hours * 60);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+//            LocalTime start = LocalTime.of(startHour, startMinute);//LocalTime.parse(startHour+":"+startMinute+" "+startPeriod, f);
+//            LocalTime end = LocalTime.parse(endHour+":"+endMinute+" "+endPeriod, f);
+//            long duration = Duration.between(start, end).toMinutes();
+
+            Time startTime = null;
+            startTime.setHours(startHour);
+            startTime.setMinutes(startMinute);
+
+            Time endTime = null;
+            endTime.setHours(endHour);
+            endTime.setMinutes(endMinute);
+
+            long duration = 0;
+            int iterations = (int)min/interval;
             // Make a daily alarm for each iteration of the alarm
             for (int i = 0; i < iterations; i++)
             {

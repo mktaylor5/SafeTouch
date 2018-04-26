@@ -32,7 +32,6 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
 //        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 //                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 //
-//
 //        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 //
 //        NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(context)
