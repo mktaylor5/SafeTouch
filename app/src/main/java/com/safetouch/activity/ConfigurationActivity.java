@@ -1,5 +1,6 @@
 package com.safetouch.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.DialogFragment;
@@ -23,7 +24,11 @@ import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
 import com.safetouch.receiver.AlarmNotificationReceiver;
 
+import java.time.Duration;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 //import com.safetouch.domain.Configuration;
@@ -213,26 +218,47 @@ public class ConfigurationActivity extends MenuActivity {
         }
 
         private void setRecurringAlarms(Context context) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String start = sharedPreferences.getString("checkin_start", "9:00");
-            String hour = start.substring(0, start.indexOf(":"));
-            String minute = start.substring(start.indexOf(":")+1);
-            String interval = sharedPreferences.getString("checkin_interval", "120");
-            long intervalMilli = TimeUnit.MINUTES.toMillis(Integer.parseInt(interval));
+//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+//            String start = sharedPreferences.getString("checkin_start", "9:00");
+//            String hour = start.substring(0, start.indexOf(":"));
+//            String minute = start.substring(start.indexOf(":") + 1);
+//            String interval = sharedPreferences.getString("checkin_interval", "120");
+//            long intervalMilli = TimeUnit.MINUTES.toMillis(Integer.parseInt(interval));
+            int startHour = 9;
+            int startMinute = 00;
+            String startPeriod = "AM";
+            int interval = 120;
+            int endHour = 7;
+            int endMinute = 00;
+            String endPeriod = "PM";
+            //long intervalMilli = TimeUnit.MINUTES.toMillis(interval);
 
             Calendar updateTime = Calendar.getInstance();
             updateTime.setTimeZone(TimeZone.getTimeZone("CDT"));
-            updateTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
-            updateTime.set(Calendar.MINUTE, Integer.parseInt(minute));
+            updateTime.set(Calendar.HOUR_OF_DAY, startHour);
+            updateTime.set(Calendar.MINUTE, startMinute);
+//            updateTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
+//            updateTime.set(Calendar.MINUTE, Integer.parseInt(minute));
 
             Intent downloader = new Intent(context, AlarmNotificationReceiver.class);
             PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarms = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-            assert alarms != null;
-            alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                    updateTime.getTimeInMillis(),
-                    intervalMilli,
-                    recurringNotification);
+
+            @SuppressLint({"NewApi", "LocalSuppress"}) DateTimeFormatter f = DateTimeFormatter.ofPattern("hh:mm a");
+            @SuppressLint({"NewApi", "LocalSuppress"}) LocalTime start = LocalTime.parse(startHour+":"+startMinute+" "+startPeriod, f);
+            @SuppressLint({"NewApi", "LocalSuppress"}) LocalTime end = LocalTime.parse(endHour+":"+endMinute+" "+endPeriod, f);
+            @SuppressLint({"NewApi", "LocalSuppress"}) long duration = Duration.between(start, end).toMinutes();
+            int iterations = (int)duration/interval;
+            // Make a daily alarm for each iteration of the alarm
+            for (int i = 0; i < iterations; i++)
+            {
+                updateTime.add(Calendar.MINUTE, interval);
+                assert alarms != null;
+                alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+                        updateTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,
+                        recurringNotification);
+            }
         }
     }
 }
