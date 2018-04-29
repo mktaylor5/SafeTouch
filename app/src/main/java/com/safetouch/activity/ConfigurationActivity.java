@@ -106,7 +106,7 @@ public class ConfigurationActivity extends MenuActivity {
                     EditTextPreference editPref = (EditTextPreference) preference;//save preference
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
-                    return false;
+                    return true;
                 }
             });
 
@@ -120,7 +120,7 @@ public class ConfigurationActivity extends MenuActivity {
                     ListPreference editPref = (ListPreference) preference;//saves new mode
                     editPref.setSummary(newMessage);
                     editPref.setValue(newMessage);
-                    return false;
+                    return true;
                 }
             });
 
@@ -141,7 +141,7 @@ public class ConfigurationActivity extends MenuActivity {
 
                     setRecurringAlarms(mContext);
 
-                    return false;
+                    return true;
                 }
             });
 
@@ -162,7 +162,7 @@ public class ConfigurationActivity extends MenuActivity {
 
                     setRecurringAlarms(mContext);
 
-                    return false;
+                    return true;
                 }
             });
 
@@ -183,7 +183,7 @@ public class ConfigurationActivity extends MenuActivity {
 
                     setRecurringAlarms(mContext);
 
-                    return false;
+                    return true;
                 }
             });
 
@@ -203,7 +203,7 @@ public class ConfigurationActivity extends MenuActivity {
                         editPref.setSummary("ON");
                         editPref.setChecked(true);
                     }
-                    return false;
+                    return true;
                 }
             });
 
@@ -219,7 +219,7 @@ public class ConfigurationActivity extends MenuActivity {
                         editPref.setSummary("ON");
                         editPref.setChecked(true);
                     }
-                    return false;
+                    return true;
                 }
             });
 
