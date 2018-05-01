@@ -25,7 +25,7 @@
         <activity
             android:name=".activity.ConfigurationActivity"
             android:label="@string/settings"
-            android:parentActivityName=".activity.MainActivity"></activity>
+            android:parentActivityName=".activity.MainActivity" />
         <activity
             android:name=".activity.EmergencyContacts"
             android:label="@string/emergency_contacts"

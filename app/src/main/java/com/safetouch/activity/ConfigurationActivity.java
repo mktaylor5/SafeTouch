@@ -27,8 +27,8 @@ import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
 import com.safetouch.receiver.AlarmNotificationReceiver;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.util.Date;
+//import java.util.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -69,7 +69,7 @@ public class ConfigurationActivity extends MenuActivity {
         }
     }
 
-    public static class PrefsFragment extends PreferenceFragment {
+    public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         private Context mContext;
         private Activity mActivity;
         AppDatabase database;
@@ -82,6 +82,24 @@ public class ConfigurationActivity extends MenuActivity {
             editor.commit();
         }
 
+        @Override
+        public void onResume() {
+            super.onResume();
+            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+        }
+
+        @Override
+        public void onPause() {
+            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+            super.onPause();
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
+        {
+            Toast.makeText(getActivity(), "Change saved.", Toast.LENGTH_LONG).show();
+            setRecurringAlarms(mContext);
+        }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -89,8 +107,6 @@ public class ConfigurationActivity extends MenuActivity {
             addPreferencesFromResource(R.xml.preferences);
             mContext = this.getActivity();
             mActivity = this.getActivity();
-
-            //Preference checkInInterval = findPreference(getString(R.string.))
 
             final EditTextPreference msg = (EditTextPreference) getPreferenceScreen().findPreference("preset_msg");
             msg.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {//when new preset msg entered
@@ -139,7 +155,7 @@ public class ConfigurationActivity extends MenuActivity {
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
 
-                    setRecurringAlarms(mContext);
+                    //setRecurringAlarms(mContext);
 
                     return true;
                 }
@@ -160,7 +176,7 @@ public class ConfigurationActivity extends MenuActivity {
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
 
-                    setRecurringAlarms(mContext);
+                    //setRecurringAlarms(mContext);
 
                     return true;
                 }
@@ -181,7 +197,7 @@ public class ConfigurationActivity extends MenuActivity {
                     editPref.setSummary(newMessage);
                     editPref.setText(newMessage);
 
-                    setRecurringAlarms(mContext);
+                    //setRecurringAlarms(mContext);
 
                     return true;
                 }
@@ -250,66 +266,51 @@ public class ConfigurationActivity extends MenuActivity {
                         alert.show();
 
                     }
-                    return false;
+                    return true;
                 }
             });
         }
 
         private void setRecurringAlarms(Context context) {
-//            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-//            String start = sharedPreferences.getString("checkin_start", "9:00");
-//            String hour = start.substring(0, start.indexOf(":"));
-//            String minute = start.substring(start.indexOf(":") + 1);
-//            String interval = sharedPreferences.getString("checkin_interval", "120");
-//            long intervalMilli = TimeUnit.MINUTES.toMillis(Integer.parseInt(interval));
-            int startHour = 9;
-            int startMinute = 00;
+            Log.i("alarms:", "setting alarms");
+            int startHour = 4;
+            int startMinute = 15;
             String startPeriod = "AM";
-            int interval = 120;
-            int endHour = 7;
-            int endMinute = 00;
-            String endPeriod = "PM";
-            //long intervalMilli = TimeUnit.MINUTES.toMillis(interval);
-
+            if (startPeriod.toLowerCase().equals("pm")) {
+                startHour += 12;
+            }
+            int interval = 1;
+            int endHour = 4;
+            int endMinute = 40;
+            String endPeriod = "AM";
+            if (endPeriod.toLowerCase().equals("pm")) {
+                endHour += 12;
+            }
             Calendar updateTime = Calendar.getInstance();
-            updateTime.setTimeZone(TimeZone.getTimeZone("CDT"));
             updateTime.set(Calendar.HOUR_OF_DAY, startHour);
             updateTime.set(Calendar.MINUTE, startMinute);
-//            updateTime.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hour));
-//            updateTime.set(Calendar.MINUTE, Integer.parseInt(minute));
 
             Intent downloader = new Intent(context, AlarmNotificationReceiver.class);
             PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarms = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
 
-            SimpleDateFormat f = new SimpleDateFormat("hh:mm aa");
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat f = new SimpleDateFormat("HH:mm");
             long min = 0;
             long difference;
             try {
-                Date test1 = (Date) f.parse("1:00 PM");
-                Date test2 = (Date) f.parse("2:00 PM");
+                Date test1 = (Date) f.parse(startHour+":"+startMinute);
+                Date test2 = (Date) f.parse(endHour+":"+endMinute);
                 difference = (test2.getTime() - test1.getTime()) / 1000;
                 long hours = difference % (24 * 3600) / 3600; // Calculating Hours
                 long minute = difference % 3600 / 60; // Calculating minutes if there is any minutes difference
                 min = minute + (hours * 60);
+
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-//            LocalTime start = LocalTime.of(startHour, startMinute);//LocalTime.parse(startHour+":"+startMinute+" "+startPeriod, f);
-//            LocalTime end = LocalTime.parse(endHour+":"+endMinute+" "+endPeriod, f);
-//            long duration = Duration.between(start, end).toMinutes();
-
-            Time startTime = null;
-            startTime.setHours(startHour);
-            startTime.setMinutes(startMinute);
-
-            Time endTime = null;
-            endTime.setHours(endHour);
-            endTime.setMinutes(endMinute);
-
-            long duration = 0;
-            int iterations = (int)min/interval;
-            // Make a daily alarm for each iteration of the alarm
+            long duration = min;
+            int iterations = (int)duration/interval;
             for (int i = 0; i < iterations; i++)
             {
                 updateTime.add(Calendar.MINUTE, interval);
@@ -318,7 +319,9 @@ public class ConfigurationActivity extends MenuActivity {
                         updateTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY,
                         recurringNotification);
+                Log.i("alarms: ", String.valueOf(alarms!=null));
             }
         }
     }
+
 }

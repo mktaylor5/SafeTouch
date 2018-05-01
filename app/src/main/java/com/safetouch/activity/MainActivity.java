@@ -3,6 +3,8 @@ package com.safetouch.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -19,6 +21,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -26,6 +30,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
 import android.text.InputType;
@@ -63,7 +68,6 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
-    private Button sendEmergencyText, escortMode, sendFalseAlarm;
     //private Button sendLocation;
     private String userAddress;
     AppDatabase database;
@@ -94,9 +98,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         database = AppDatabase.getInstance(MainActivity.this);
 
         //sendLocation = (Button) findViewById(R.id.send_location);
-        sendEmergencyText = (Button) findViewById(R.id.send_text);
-        escortMode = (Button) findViewById(R.id.escort_mode);
-        sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
+        Button sendEmergencyText = (Button) findViewById(R.id.send_text);
+        Button escortMode = (Button) findViewById(R.id.escort_mode);
+        Button sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
+
+        Button notificationTest = (Button) findViewById(R.id.notification_test);
 
         // Bluetooth
 //        establishBluetoothConnection();
@@ -156,6 +162,36 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         // Escort Mode
         EscortMode();
 
+
+        // Test notification builder
+        final int MID = 0;
+        notificationTest.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                long when = System.currentTimeMillis();
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext()
+                        .getSystemService(Context.NOTIFICATION_SERVICE);
+
+                Intent notificationIntent = new Intent(getApplicationContext(), Configuration.class);
+                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                        notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
+                NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(getApplicationContext())
+                        .setSmallIcon(R.drawable.person2)
+                        .setContentTitle("Alarm Fired")
+                        .setContentText("Events to be Performed")
+                        .setSound(alarmSound)
+                        .setAutoCancel(true).setWhen(when)
+                        .setContentIntent(pendingIntent)
+                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
+
+                notificationManager.notify(MID, mNotifyBuilder.build());
+            }
+        });
     }
 
     private void requestLocationPermission() {

@@ -1,12 +1,13 @@
 <resources>
     <string name="app_name">SafeTouch</string>
-    <string name="db_name">SafetouchDB</string>
+    <string name="db_name">SafeTouchDB</string>
     <string name="home">Home</string>
     <string name="emergency_contacts">Contacts</string>
     <string name="settings">Settings</string>
     <string name="escort_mode">Escort Mode</string>
     <string name="location">Location</string>
-    <string name="send_sms">Send SMS</string>
+    <string name="send_emergency_text">Send Emergency Text</string>
+    <string name="send_false_alarm">Send False Alarm</string>
     <string name="personal_mode">Personal Mode</string>
 
     <string name="general">General</string>
@@ -26,4 +27,5 @@
     <string name="change_mode">Selected mode</string>
     <string name="mode_summary">Click to see mode</string>
     <string name="change_mode_dialog">Please select a mode</string>
+    <string name="safetouch_logo">SafeTouch Logo</string>
 </resources>
