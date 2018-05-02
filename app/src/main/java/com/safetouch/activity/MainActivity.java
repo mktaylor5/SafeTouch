@@ -2,44 +2,31 @@ package com.safetouch.activity;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.SmsManager;
-import android.text.InputType;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -68,23 +55,24 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
+    private Button sendEmergencyText, escortMode;
     //private Button sendLocation;
     private String userAddress;
     AppDatabase database;
 
-//    private BluetoothAdapter btAdapter = null;
-      private Handler btHandler; // Our main handler that will receive callback notifications
-//    private ConnectedThread btConnectedThread; // bluetooth background worker thread to send and receive data
-//    private BluetoothSocket btSocket = null; // bi-directional client-to-client data path
-//
-//    private final String TAG = MainActivity.class.getSimpleName();
-//    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
-//
-//    // #defines for identifying shared types between calling functions
-//    private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
-      private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
-      private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
-//
+    private BluetoothAdapter btAdapter = null;
+    private Handler btHandler; // Our main handler that will receive callback notifications
+    private ConnectedThread btConnectedThread; // bluetooth background worker thread to send and receive data
+    private BluetoothSocket btSocket = null; // bi-directional client-to-client data path
+    private TextView btStatus;
+
+    private final String TAG = MainActivity.class.getSimpleName();
+    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
+
+    // #defines for identifying shared types between calling functions
+    private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
+    private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
+    private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
     SmsManager smsManager = SmsManager.getDefault();
@@ -98,14 +86,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         database = AppDatabase.getInstance(MainActivity.this);
 
         //sendLocation = (Button) findViewById(R.id.send_location);
-        Button sendEmergencyText = (Button) findViewById(R.id.send_text);
-        Button escortMode = (Button) findViewById(R.id.escort_mode);
-        Button sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
-
-        Button notificationTest = (Button) findViewById(R.id.notification_test);
+        sendEmergencyText = (Button) findViewById(R.id.send_text);
+        escortMode = (Button) findViewById(R.id.escort_mode);
 
         // Bluetooth
-//        establishBluetoothConnection();
+        establishBluetoothConnection();
         btHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 //Log.d(msg.obj.toString(), "msg");
@@ -114,7 +99,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
                         //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                        if (readMessage == "emergency")
+                        if (readMessage != null)
                         {
                             // Sends text and location information
                             sendSMSEmergencyText();
@@ -151,45 +136,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             }
         });
 
-        // False Alarm Text
-        sendFalseAlarm.setOnClickListener(new View.OnClickListener() {
+        // Escort Mode
+        escortMode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendFalseAlarmText();
-            }
-        });
-
-        // Escort Mode
-        EscortMode();
-
-
-        // Test notification builder
-        final int MID = 0;
-        notificationTest.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                long when = System.currentTimeMillis();
-                NotificationManager notificationManager = (NotificationManager) getApplicationContext()
-                        .getSystemService(Context.NOTIFICATION_SERVICE);
-
-                Intent notificationIntent = new Intent(getApplicationContext(), Configuration.class);
-                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                        notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(getApplicationContext())
-                        .setSmallIcon(R.drawable.person2)
-                        .setContentTitle("Alarm Fired")
-                        .setContentText("Events to be Performed")
-                        .setSound(alarmSound)
-                        .setAutoCancel(true).setWhen(when)
-                        .setContentIntent(pendingIntent)
-                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-
-                notificationManager.notify(MID, mNotifyBuilder.build());
+                beginEscortMode(view);
             }
         });
     }
@@ -270,72 +221,72 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         }
     };
 
-//    public void establishBluetoothConnection() {
-//        btAdapter = BluetoothAdapter.getDefaultAdapter();
-//        if (btAdapter == null) {
-//            //Show a message that the device has no bluetooth adapter
-//            Toast.makeText(getApplicationContext(), "Bluetooth not available on this device.", Toast.LENGTH_LONG).show();
-//            //finish();
-//        } else {
-//            if (btAdapter.isEnabled()) {
-//                new Thread() {
-//                    public void run() {
-//                        boolean fail = false;
-//                        String address = "";
-//
-//                        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
-//                        for(BluetoothDevice device: devices){
-//                            if(device.getName().equals("HC-05")){
-//                                address = device.getAddress();
-//                            }
-//                        }
-//                        BluetoothDevice device = btAdapter.getRemoteDevice(address);
-//
-//                        try {
-//                            btSocket = createBluetoothSocket(device);
-//                        } catch (IOException e) {
-//                            fail = true;
-//                            Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
-//                        }
-//                        // Establish the Bluetooth socket connection.
-//                        try {
-//                            btSocket.connect();
-//                        } catch (IOException e) {
-//                            try {
-//                                fail = true;
-//                                btSocket.close();
-//                                btHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
-//                                        .sendToTarget();
-//                            } catch (IOException e2) {
-//                                //insert code to deal with this
-//                                Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
-//                            }
-//                        }
-//                        if (fail == false) {
-//                            btConnectedThread = new ConnectedThread(btSocket);
-//                            btConnectedThread.start();
-//                            btHandler.obtainMessage(CONNECTING_STATUS, 1, -1, device.getName()).sendToTarget();
-//                        }
-//                    }
-//                }.start();
-//            } else {
-//                //Ask to the user turn the bluetooth on
-//                //Toast.makeText(this, "Bluetooth device not available", Toast.LENGTH_LONG).show();
-//                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-//            }
-//        }
-//    }
-//
-//    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
-//        try {
-//            final Method m = device.getClass().getMethod("createRfcommSocketToServiceRecord", UUID.class);
-//            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
-//        } catch (Exception e) {
-//            Log.e(TAG, "Could not create RFComm Connection", e);
-//        }
-//        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-//    }
+    public void establishBluetoothConnection() {
+        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (btAdapter == null) {
+            //Show a message that the device has no bluetooth adapter
+            Toast.makeText(getApplicationContext(), "Bluetooth not available on this device.", Toast.LENGTH_LONG).show();
+            //finish();
+        } else {
+            if (btAdapter.isEnabled()) {
+                new Thread() {
+                    public void run() {
+                        boolean fail = false;
+                        String address = "";
+
+                        Set<BluetoothDevice> devices = btAdapter.getBondedDevices();
+                        for(BluetoothDevice device: devices){
+                            if(device.getName().equals("HC-05")){
+                                address = device.getAddress();
+                            }
+                        }
+                        BluetoothDevice device = btAdapter.getRemoteDevice(address);
+
+                        try {
+                            btSocket = createBluetoothSocket(device);
+                        } catch (IOException e) {
+                            fail = true;
+                            Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
+                        }
+                        // Establish the Bluetooth socket connection.
+                        try {
+                            btSocket.connect();
+                        } catch (IOException e) {
+                            try {
+                                fail = true;
+                                btSocket.close();
+                                btHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
+                                        .sendToTarget();
+                            } catch (IOException e2) {
+                                //insert code to deal with this
+                                Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        if (fail == false) {
+                            btConnectedThread = new ConnectedThread(btSocket);
+                            btConnectedThread.start();
+                            btHandler.obtainMessage(CONNECTING_STATUS, 1, -1, device.getName()).sendToTarget();
+                        }
+                    }
+                }.start();
+            } else {
+                //Ask to the user turn the bluetooth on
+                //Toast.makeText(this, "Bluetooth device not available", Toast.LENGTH_LONG).show();
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            }
+        }
+    }
+
+    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws IOException {
+        try {
+            final Method m = device.getClass().getMethod("createRfcommSocketToServiceRecord", UUID.class);
+            return (BluetoothSocket) m.invoke(device, BTMODULEUUID);
+        } catch (Exception e) {
+            Log.e(TAG, "Could not create RFComm Connection", e);
+        }
+        return device.createRfcommSocketToServiceRecord(BTMODULEUUID);
+    }
 
     public static String getDefaults(String key, Context context) {//to get string from settings
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -358,25 +309,6 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 String location = userAddress;
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
-                    smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
-                }
-                Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception ex) {
-            Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
-            ex.printStackTrace();
-        }
-    }
-
-    public void sendFalseAlarmText() {
-        List<Contact> contacts = database.getContactDao().getAll();
-        try {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                getPermissionToReadSMS();
-            } else {
-                for (Contact contact : contacts) {
-                    String message = "From SafeTouch: The last text was a result of a unintentional button press. Please ignore.";
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
@@ -412,143 +344,67 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-    public boolean verifyPin(String input){
-        String pin = getDefaults("pin",getApplicationContext());
-        if(pin.equals(input)){
-            return true;
-        }
-        return false;
+
+    private void beginEscortMode(View view) {
+
     }
-    public void pinDialog(final CountDownTimer timer){//dialog shown when button unpressed
-        LinearLayout layout = new LinearLayout(MainActivity.this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        final EditText numberInput = new EditText(MainActivity.this);
-        numberInput.setInputType(InputType.TYPE_CLASS_PHONE);
-        layout.addView(numberInput);
 
-        final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).setView(layout)
-                .setPositiveButton("SUBMIT", null)
-                .setNegativeButton("CLOSE", null)
-                .setTitle("Enter PIN to disable.")
-                .setMessage("Or hold down button again to continue.")
-                .show();
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
 
-        Button b = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        b.setOnClickListener(new View.OnClickListener() {
+        public ConnectedThread(BluetoothSocket socket) {
+            mmSocket = socket;
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
 
-            @Override
-            public void onClick(View view) {
-                if(verifyPin(numberInput.getText().toString()) == true) {
-                    timer.cancel();//stop timer
-                    finish();
-                    startActivity(getIntent());
-                }else{//wrong pin
-                    numberInput.setError("Wrong PIN");
+            // Get the input and output streams, using temp objects because member streams are final
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) { }
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        public void run() {
+            byte[] buffer = new byte[1024];  // buffer store for the stream
+            int bytes; // bytes returned from read()
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
+                    // Read from the InputStream
+                    bytes = mmInStream.available();
+                    if(bytes != 0) {
+                        buffer = new byte[1024];
+                        SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
+                        bytes = mmInStream.available(); // how many bytes are ready to be read?
+                        bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
+                        btHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                                .sendToTarget(); // Send the obtained bytes to the UI activity
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
                 }
             }
-        });
-    }
-    boolean isRunning = false;
-    CountDownTimer timer;
-    @SuppressLint("ClickableViewAccessibility")
-    private void EscortMode() {
-        final Button button = findViewById(R.id.escort_mode);
-            button.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                    boolean escortPref = sharedPreferences.getBoolean("escort", false);
-                    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-                        button.setText("Button Pressed");
-                        if (escortPref == false) {//check if mode in on
-                            Toast.makeText(getApplicationContext(), "Turn escort mode on in settings", Toast.LENGTH_SHORT).show();
-                            button.setText("Escort Mode");
-                        }
-                        else if(isRunning == true){//stop timer
-                            timer.cancel();
-                            isRunning=false;
-                        }
-                    }if (event.getAction() == MotionEvent.ACTION_UP && escortPref == true && isRunning == false) {
-                                button.setText("Button UnPressed!");
-                                timer = new CountDownTimer(30000, 1000) {//30 seconds
-                                public void onTick(long millisUntilFinished) {
-                                    isRunning = true;
-                                }
-                                public void onFinish() {
-                                    //Toast.makeText(getApplicationContext(), "timer done!", Toast.LENGTH_SHORT).show();
-                                    isRunning=false;
-                                    sendSMSEmergencyText();
-                                    finish();
-                                    startActivity(getIntent());
-                                }
-
-                            }.start();
-                        pinDialog(timer);
-                    }
-                    return true;
-                }
-            });
         }
 
+        /* Call this from the main activity to send data to the remote device */
+        public void write(String input) {
+            byte[] bytes = input.getBytes();           //converts entered String into bytes
+            try {
+                mmOutStream.write(bytes);
+            } catch (IOException e) { }
+        }
+
+        /* Call this from the main activity to shutdown the connection */
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) { }
+        }
     }
-
-
-
-//    private class ConnectedThread extends Thread {
-//        private final BluetoothSocket mmSocket;
-//        private final InputStream mmInStream;
-//        private final OutputStream mmOutStream;
-//
-//        public ConnectedThread(BluetoothSocket socket) {
-//            mmSocket = socket;
-//            InputStream tmpIn = null;
-//            OutputStream tmpOut = null;
-//
-//            // Get the input and output streams, using temp objects because member streams are final
-//            try {
-//                tmpIn = socket.getInputStream();
-//                tmpOut = socket.getOutputStream();
-//            } catch (IOException e) { }
-//
-//            mmInStream = tmpIn;
-//            mmOutStream = tmpOut;
-//        }
-//
-//        public void run() {
-//            byte[] buffer = new byte[1024];  // buffer store for the stream
-//            int bytes; // bytes returned from read()
-//            // Keep listening to the InputStream until an exception occurs
-//            while (true) {
-//                try {
-//                    // Read from the InputStream
-//                    bytes = mmInStream.available();
-//                    if(bytes != 0) {
-//                        buffer = new byte[1024];
-//                        SystemClock.sleep(100); //pause and wait for rest of data. Adjust this depending on your sending speed.
-//                        bytes = mmInStream.available(); // how many bytes are ready to be read?
-//                        bytes = mmInStream.read(buffer, 0, bytes); // record how many bytes we actually read
-//                        btHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-//                                .sendToTarget(); // Send the obtained bytes to the UI activity
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    break;
-//                }
-//            }
-//        }
-//
-//        /* Call this from the main activity to send data to the remote device */
-//        public void write(String input) {
-//            byte[] bytes = input.getBytes();           //converts entered String into bytes
-//            try {
-//                mmOutStream.write(bytes);
-//            } catch (IOException e) { }
-//        }
-//
-//        /* Call this from the main activity to shutdown the connection */
-//        public void cancel() {
-//            try {
-//                mmSocket.close();
-//            } catch (IOException e) { }
-//        }
-//    }
+}

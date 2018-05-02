@@ -14,26 +14,12 @@
             android:defaultValue="false"
             android:summary="@string/button_summary"/>
 
-        <SwitchPreference
-            android:key="escort"
-            android:title="@string/escort"
-            android:defaultValue="false"
-            android:summary="@string/escort_summary"/>
-
+        <!--TO DO: need to make the preset msg input the sms text-->
         <EditTextPreference
             android:key="preset_msg"
             android:title="@string/preset_msg_title"
             android:summary="@string/preset_msg_summary"
             android:dialogTitle="@string/preset_msg_dialog"
-            />
-
-        <EditTextPreference
-            android:key="pin"
-            android:title="@string/pin_title"
-            android:summary="@string/pin_summary"
-            android:dialogTitle="@string/pin_dialog"
-            android:inputType="numberDecimal"
-            android:digits="0123456789"
             />
 
     </PreferenceCategory>
@@ -47,31 +33,6 @@
             android:entries="@array/three_modes_list"
             android:entryValues="@array/entryvalues_list_preference"
             android:dialogTitle="@string/change_mode_dialog"
-            />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="Check-In">
-        <EditTextPreference
-            android:key="checkin_start"
-            android:title="Check-In Start Time"
-            android:summary="Start Time"
-            android:dialogTitle="Check-In Start Time"
-            />
-
-        <EditTextPreference
-            android:key="checkin_end"
-            android:title="Check-In End Time"
-            android:summary="End Time"
-            android:dialogTitle="Check-In End Time"
-            />
-
-        <EditTextPreference
-            android:key="checkin_interval"
-            android:title="Check-In Interval"
-            android:summary="Interval (in minutes)"
-            android:dialogTitle="Check-In Interval"
             />
 
     </PreferenceCategory>

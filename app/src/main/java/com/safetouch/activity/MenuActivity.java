@@ -11,7 +11,7 @@ import com.safetouch.R;
  * Created by mktay on 3/6/2018.
  */
 
-public class MenuActivity extends AppCompatActivity{//BluetoothActivity { need this?
+public class MenuActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

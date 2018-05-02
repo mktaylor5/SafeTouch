@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.safetouch.activity.MainActivity">
 
+    <!--Text Title-->
+
     <TextView
         android:id="@+id/mode_title"
         android:layout_width="wrap_content"
@@ -41,8 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.168"
-        app:srcCompat="@drawable/person2"
-        android:contentDescription="@string/safetouch_logo" />
+        app:srcCompat="@drawable/person2" />
 
     <Button
         android:id="@+id/send_text"
@@ -53,7 +54,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/ovalbutton"
-        android:text="@string/send_emergency_text"
+        android:text="Send Text"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -63,24 +64,24 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.023" />
 
-    <Button
-        android:id="@+id/send_false_alarm"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/ovalbutton"
-        android:text="@string/send_false_alarm"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/send_text"
-        app:layout_constraintVertical_bias="0.031" />
+    <!--<Button-->
+        <!--android:id="@+id/send_location"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:background="@drawable/ovalbutton"-->
+        <!--android:text="Send location"-->
+        <!--android:textSize="18sp"-->
+        <!--android:textStyle="bold"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintHorizontal_bias="0.498"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/send_text"-->
+        <!--app:layout_constraintVertical_bias="0.031" />-->
 
     <Button
         android:id="@+id/escort_mode"
@@ -91,33 +92,23 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="@drawable/ovalbutton"
-        android:text="@string/escort_mode"
+        android:text="Escort mode"
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/send_false_alarm"
+        app:layout_constraintTop_toBottomOf="@+id/send_text"
         app:layout_constraintVertical_bias="0.031" />
+        <!--app:layout_constraintTop_toBottomOf="@+id/send_location"-->
+        <!--app:layout_constraintVertical_bias="0.089" />-->
 
-    <Button
-        android:id="@+id/notification_test"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:background="@drawable/ovalbutton"
-        android:text="Notification Test"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/escort_mode"
-        app:layout_constraintVertical_bias="0.031" />
+
+    <!--Send SMS Button-->
+
+    <!--Location Button-->
+
+    <!--Escort Mode Button-->
 
 </android.support.constraint.ConstraintLayout>
