@@ -45,6 +45,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
 
+        assert notificationManager != null;
         notificationManager.notify(MID, mNotifyBuilder.build());
         MID++;
     }

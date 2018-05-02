@@ -31,6 +31,9 @@
         </activity>
 
         <activity
+            android:name=".activity.HomeActivity"
+            android:label="Select a Mode" />
+        <activity
             android:name=".activity.MainActivity"
             android:label="Personal Mode" />
         <activity

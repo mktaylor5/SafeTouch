@@ -5,16 +5,12 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -97,15 +93,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         requestLocationPermission();
         database = AppDatabase.getInstance(MainActivity.this);
 
-        //sendLocation = (Button) findViewById(R.id.send_location);
         Button sendEmergencyText = (Button) findViewById(R.id.send_text);
         Button escortMode = (Button) findViewById(R.id.escort_mode);
         Button sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
 
-        Button notificationTest = (Button) findViewById(R.id.notification_test);
-
         // Bluetooth
-//        establishBluetoothConnection();
         btHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 //Log.d(msg.obj.toString(), "msg");
@@ -161,37 +153,6 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
         // Escort Mode
         EscortMode();
-
-
-        // Test notification builder
-        final int MID = 0;
-        notificationTest.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                long when = System.currentTimeMillis();
-                NotificationManager notificationManager = (NotificationManager) getApplicationContext()
-                        .getSystemService(Context.NOTIFICATION_SERVICE);
-
-                Intent notificationIntent = new Intent(getApplicationContext(), Configuration.class);
-                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-                        notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-                NotificationCompat.Builder mNotifyBuilder = new NotificationCompat.Builder(getApplicationContext())
-                        .setSmallIcon(R.drawable.person2)
-                        .setContentTitle("Alarm Fired")
-                        .setContentText("Events to be Performed")
-                        .setSound(alarmSound)
-                        .setAutoCancel(true).setWhen(when)
-                        .setContentIntent(pendingIntent)
-                        .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000});
-
-                notificationManager.notify(MID, mNotifyBuilder.build());
-            }
-        });
     }
 
     private void requestLocationPermission() {

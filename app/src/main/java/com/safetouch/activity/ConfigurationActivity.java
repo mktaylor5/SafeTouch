@@ -38,9 +38,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-//import com.safetouch.domain.Configuration;
-//import com.safetouch.preference.TimePreference;
-//import com.safetouch.preference.TimePreferenceDialogFragmentCompat;
 
 /**
  * Created by mktay on 3/5/2018.
@@ -54,20 +51,18 @@ public class ConfigurationActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new PrefsFragment()).commit();
-
-
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                this.finish();// go to parent activity.
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
+//        switch (item.getItemId()) {
+//            case android.R.id.home:
+//                this.finish();// go to parent activity.
+//                return true;
+//            default:
+//                return super.onOptionsItemSelected(item);
+//        }
+//    }
 
     public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         private Context mContext;
@@ -97,7 +92,7 @@ public class ConfigurationActivity extends MenuActivity {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
-            Toast.makeText(getActivity(), "Change saved.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Changes saved.", Toast.LENGTH_LONG).show();
             setRecurringAlarms(mContext);
         }
 
@@ -271,21 +266,57 @@ public class ConfigurationActivity extends MenuActivity {
             });
         }
 
+        public static String getDefaults(String key, Context context) {//to get string from settings
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            return preferences.getString(key, null);
+        }
+
         private void setRecurringAlarms(Context context) {
             Log.i("alarms:", "setting alarms");
-            int startHour = 4;
-            int startMinute = 15;
-            String startPeriod = "AM";
-            if (startPeriod.toLowerCase().equals("pm")) {
-                startHour += 12;
+
+            // Parse Start Time
+            String start = getDefaults("checkin_start", context);
+            // DEFAULT
+            int startHour = 8;
+            int startMinute = 30;
+            if (start != null)
+            {
+                int startIndex = start.indexOf(":");
+                String startHourString = start.substring(0, startIndex);
+                startHour = Integer.getInteger(startHourString);
+                String startMinuteString = start.substring(startIndex+1, start.length());
+                startMinute = Integer.getInteger(startMinuteString);
+                //String startPeriod = "AM";
+                //if (startPeriod.toLowerCase().equals("pm")) {
+                //    startHour += 12;
+                //}
             }
-            int interval = 1;
-            int endHour = 4;
-            int endMinute = 40;
-            String endPeriod = "AM";
-            if (endPeriod.toLowerCase().equals("pm")) {
-                endHour += 12;
+
+            // Interval of Alarms (in minutes)
+            String intervalString = getDefaults("interval", context);
+            int interval = 120;
+            if (intervalString != null)
+            {
+                interval = Integer.getInteger(intervalString);
             }
+
+            // Parse End Time
+            String end = getDefaults("checkin_end", context);
+            int endHour = 8;
+            int endMinute = 30;
+            if (end != null)
+            {
+                int endIndex = end.indexOf(":");
+                String endHourString = end.substring(0, endIndex);
+                endHour = Integer.getInteger(endHourString);
+                String endMinuteString = end.substring(endIndex+1, end.length());
+                endMinute = Integer.getInteger(endMinuteString);
+                //String endPeriod = "AM";
+                //if (endPeriod.toLowerCase().equals("pm")) {
+                //    endHour += 12;
+                //}
+            }
+
             Calendar updateTime = Calendar.getInstance();
             updateTime.set(Calendar.HOUR_OF_DAY, startHour);
             updateTime.set(Calendar.MINUTE, startMinute);
@@ -299,9 +330,22 @@ public class ConfigurationActivity extends MenuActivity {
             long min = 0;
             long difference;
             try {
-                Date test1 = (Date) f.parse(startHour+":"+startMinute);
-                Date test2 = (Date) f.parse(endHour+":"+endMinute);
-                difference = (test2.getTime() - test1.getTime()) / 1000;
+                Date date1, date2;
+                if (start != null) {
+                    date1 = f.parse(start);
+                }
+                else {
+                    date1 = f.parse(startHour+":"+startMinute);
+                }
+
+                if (end != null) {
+                    date2 = f.parse(end);
+                }
+                else {
+                    date2 = f.parse(endHour+":"+endMinute);
+                }
+
+                difference = (date2.getTime() - date1.getTime()) / 1000;
                 long hours = difference % (24 * 3600) / 3600; // Calculating Hours
                 long minute = difference % 3600 / 60; // Calculating minutes if there is any minutes difference
                 min = minute + (hours * 60);
@@ -319,7 +363,6 @@ public class ConfigurationActivity extends MenuActivity {
                         updateTime.getTimeInMillis(),
                         AlarmManager.INTERVAL_DAY,
                         recurringNotification);
-                Log.i("alarms: ", String.valueOf(alarms!=null));
             }
         }
     }

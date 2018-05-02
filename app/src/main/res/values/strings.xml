@@ -28,4 +28,8 @@
     <string name="mode_summary">Click to see mode</string>
     <string name="change_mode_dialog">Please select a mode</string>
     <string name="safetouch_logo">SafeTouch Logo</string>
+    <string name="check_in">Check In</string>
+    <string name="parent_mode">Parent Mode</string>
+    <string name="medical_mode">Medical Mode</string>
+    <string name="notification_test">Notification Test</string>
 </resources>
