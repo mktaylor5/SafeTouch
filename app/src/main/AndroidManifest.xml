@@ -15,24 +15,30 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/NoAnimTheme">
-        <activity android:name=".activity.HomeActivity">
+        <activity
+            android:name=".activity.HomeActivity"
+            android:label="Home" />
+
+        <activity
+            android:name=".activity.MainActivity"
+            android:label="Personal Mode" />
+        <activity
+            android:name=".activity.ConfigurationActivity"
+            android:label="@string/settings" />
+        <activity
+            android:name=".activity.EmergencyContacts"
+            android:label="@string/emergency_contacts" />
+        <activity android:name=".activity.MedicalActivity"
+            android:label="Medical Mode"/>
+        <activity android:name=".activity.ParentActivity"
+            android:label="Parent Mode"/>
+        <activity android:name=".activity.WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-                android:name=".activity.MainActivity"
-                android:label="Personal Mode" ></activity>
-        <activity
-            android:name=".activity.ConfigurationActivity"
-            android:label="@string/settings"></activity>
-        <activity
-            android:name=".activity.EmergencyContacts"
-            android:label="@string/emergency_contacts"></activity>
-
-
     </application>
 
 </manifest>

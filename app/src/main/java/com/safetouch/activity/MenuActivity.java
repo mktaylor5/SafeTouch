@@ -1,5 +1,6 @@
 package com.safetouch.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -26,7 +27,7 @@ public class MenuActivity extends AppCompatActivity {
 
         if (id == R.id.home) {
             //Toast.makeText(this, "Home", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, HomeActivity.class);
             startActivity(intent);
         }
         else if (id == R.id.emergency_contacts) {

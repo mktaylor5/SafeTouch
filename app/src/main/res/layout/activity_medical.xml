@@ -4,9 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.safetouch.activity.MainActivity">
-
-    <!--Text Title-->
+    tools:context=".activity.MedicalActivity">
 
     <Button
         android:id="@+id/Checkin"
@@ -58,8 +56,8 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="244dp"
-        android:layout_height="208dp"
+        android:layout_width="180dp"
+        android:layout_height="172dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="68dp"
@@ -67,6 +65,6 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/parent" />
+        app:srcCompat="@drawable/medical2" />
 
 </android.support.constraint.ConstraintLayout>
