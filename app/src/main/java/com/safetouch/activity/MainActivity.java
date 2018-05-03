@@ -357,22 +357,22 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        // Make sure it's our original READ_CONTACTS request
-        if (requestCode == READ_SMS_PERMISSIONS_REQUEST) {
-            if (grantResults.length == 1 &&
-                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // do nothing
-               // Toast.makeText(this, "Read SMS permission granted\n"+userAddress, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
-            }
-
-        } else {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+//        // Make sure it's our original READ_CONTACTS request
+//        if (requestCode == READ_SMS_PERMISSIONS_REQUEST) {
+//            if (grantResults.length == 1 &&
+//                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // do nothing
+//               // Toast.makeText(this, "Read SMS permission granted\n"+userAddress, Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
+//            }
+//
+//        } else {
+//            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        }
+//    }
     public boolean verifyPin(String input){
         String pin = getDefaults("pin",getApplicationContext());
         if(pin.equals(input)){
