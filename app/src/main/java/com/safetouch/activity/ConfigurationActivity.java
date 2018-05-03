@@ -93,7 +93,12 @@ public class ConfigurationActivity extends MenuActivity {
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
         {
             Toast.makeText(getActivity(), "Changes saved.", Toast.LENGTH_LONG).show();
-            setRecurringAlarms(mContext);
+            String mode = sharedPreferences.getString("mode_list", "none");
+            Log.i("mode:" , mode);
+            if (mode.toLowerCase().equals("medical") || mode.toLowerCase().equals("parent"))
+            {
+                setRecurringAlarms(mContext);
+            }
         }
 
         @Override
@@ -283,9 +288,11 @@ public class ConfigurationActivity extends MenuActivity {
             {
                 int startIndex = start.indexOf(":");
                 String startHourString = start.substring(0, startIndex);
-                startHour = Integer.getInteger(startHourString);
+                Log.i("start hour", startHourString);
+                startHour = Integer.parseInt(startHourString);
                 String startMinuteString = start.substring(startIndex+1, start.length());
-                startMinute = Integer.getInteger(startMinuteString);
+                Log.i("start minute", startMinuteString);
+                startMinute = Integer.parseInt(startMinuteString);
                 //String startPeriod = "AM";
                 //if (startPeriod.toLowerCase().equals("pm")) {
                 //    startHour += 12;
@@ -297,7 +304,7 @@ public class ConfigurationActivity extends MenuActivity {
             int interval = 120;
             if (intervalString != null)
             {
-                interval = Integer.getInteger(intervalString);
+                interval = Integer.parseInt(intervalString);
             }
 
             // Parse End Time
@@ -308,9 +315,9 @@ public class ConfigurationActivity extends MenuActivity {
             {
                 int endIndex = end.indexOf(":");
                 String endHourString = end.substring(0, endIndex);
-                endHour = Integer.getInteger(endHourString);
+                endHour = Integer.parseInt(endHourString);
                 String endMinuteString = end.substring(endIndex+1, end.length());
-                endMinute = Integer.getInteger(endMinuteString);
+                endMinute = Integer.parseInt(endMinuteString);
                 //String endPeriod = "AM";
                 //if (endPeriod.toLowerCase().equals("pm")) {
                 //    endHour += 12;
