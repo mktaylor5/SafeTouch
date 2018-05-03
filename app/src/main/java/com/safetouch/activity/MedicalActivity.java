@@ -42,9 +42,10 @@ public class MedicalActivity extends MenuActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_medical);
+        database = AppDatabase.getInstance(MedicalActivity.this);
 
-        Button sendEmergencyText = (Button) findViewById(R.id.send_text);
-        Button sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
+        Button sendEmergencyText = (Button) findViewById(R.id.sendtext);
+        Button sendFalseAlarm = (Button) findViewById(R.id.falsealarm);
 
         client = LocationServices.getFusedLocationProviderClient(this);
 

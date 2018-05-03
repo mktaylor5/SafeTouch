@@ -10,6 +10,7 @@ import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.preference.EditTextPreference;
 import android.content.SharedPreferences;
 import android.preference.ListPreference;
@@ -27,6 +28,7 @@ import com.safetouch.R;
 import com.safetouch.database.AppDatabase;
 import com.safetouch.receiver.AlarmNotificationReceiver;
 
+import java.util.ArrayList;
 import java.util.Date;
 //import java.util.Time;
 import java.text.ParseException;
@@ -38,10 +40,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
-
-/**
- * Created by mktay on 3/5/2018.
- */
 
 public class ConfigurationActivity extends MenuActivity {
     AppDatabase database;
@@ -300,8 +298,8 @@ public class ConfigurationActivity extends MenuActivity {
             }
 
             // Interval of Alarms (in minutes)
-            String intervalString = getDefaults("interval", context);
-            int interval = 120;
+            String intervalString = getDefaults("checkin_interval", context);
+            int interval = 1;
             if (intervalString != null)
             {
                 interval = Integer.parseInt(intervalString);
@@ -325,12 +323,16 @@ public class ConfigurationActivity extends MenuActivity {
             }
 
             Calendar updateTime = Calendar.getInstance();
+            updateTime.set(Calendar.MONTH, 5);
+            updateTime.set(Calendar.DAY_OF_MONTH, 3);
+            updateTime.set(Calendar.YEAR, 2018);
             updateTime.set(Calendar.HOUR_OF_DAY, startHour);
             updateTime.set(Calendar.MINUTE, startMinute);
+            updateTime.set(Calendar.SECOND, 0);
 
-            Intent downloader = new Intent(context, AlarmNotificationReceiver.class);
-            PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager alarms = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            //Intent downloader = new Intent(context, AlarmNotificationReceiver.class);
+            //PendingIntent recurringNotification = PendingIntent.getBroadcast(context, 0, downloader, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat f = new SimpleDateFormat("HH:mm");
@@ -362,15 +364,33 @@ public class ConfigurationActivity extends MenuActivity {
             }
             long duration = min;
             int iterations = (int)duration/interval;
-            for (int i = 0; i < iterations; i++)
-            {
-                updateTime.add(Calendar.MINUTE, interval);
+            Log.i("alarmsduration/interval", String.valueOf(duration) + " " + String.valueOf(interval));
+
+            //assert alarms != null;
+            //alarms.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, updateTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, recurringNotification);
+//            alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+//                updateTime.getTimeInMillis(),
+//                AlarmManager.INTERVAL_DAY,
+//                recurringNotification);
+
+            //for (int i = 1; i < iterations+1; i++)
+            //{
+//                updateTime.add(Calendar.MINUTE, interval);
+//                assert alarms != null;
+//                alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
+//                        updateTime.getTimeInMillis(),
+//                        AlarmManager.INTERVAL_DAY,
+//                        recurringNotification);
+                Intent intent = new Intent(context, AlarmNotificationReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
                 assert alarms != null;
-                alarms.setInexactRepeating(AlarmManager.RTC_WAKEUP,
-                        updateTime.getTimeInMillis(),
-                        AlarmManager.INTERVAL_DAY,
-                        recurringNotification);
-            }
+                alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        SystemClock.elapsedRealtime() + (interval * 60000 * 1),
+                        pendingIntent);
+
+                //updateTime.add(Calendar.MINUTE, interval);
+                //Log.i("alarms:", updateTime.toString());
+            //}
         }
     }
 
