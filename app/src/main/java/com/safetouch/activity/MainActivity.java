@@ -152,9 +152,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
     //this sendLocation method should be called before getting the useraddress
 
-    private void sendLocation() {
+    private String sendLocation() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return null;
         }
         client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -169,6 +169,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
             }
         });
+        return userAddress;
     }
 
     private String getAddress(Context ctx, double lat, double lon) {
@@ -305,10 +306,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                sendLocation();
-                String location = userAddress;
+
+
                 for (Contact contact : contacts) {
-                    String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
+                    String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + sendLocation();
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
