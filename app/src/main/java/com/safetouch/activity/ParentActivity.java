@@ -1,11 +1,16 @@
 package com.safetouch.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +30,7 @@ import com.safetouch.database.AppDatabase;
 import com.safetouch.domain.Contact;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
 
@@ -35,9 +41,17 @@ public class ParentActivity extends MenuActivity {
     private FusedLocationProviderClient client;
     SmsManager smsManager = SmsManager.getDefault();
 
+    private Handler btHandler; // Our main handler that will receive callback notifications
+    private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
+    private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
+
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    final boolean alarmOn = preferences.getBoolean("alarmOnOff", false);
+
     private String userAddress;
     AppDatabase database;
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +62,36 @@ public class ParentActivity extends MenuActivity {
         Button sendFalseAlarm = (Button) findViewById(R.id.falsealarm);
 
         client = LocationServices.getFusedLocationProviderClient(this);
+
+        // Bluetooth
+        btHandler = new Handler() {
+            public void handleMessage(android.os.Message msg) {
+                //Log.d(msg.obj.toString(), "msg");
+                if (msg.what == MESSAGE_READ) {
+                    String readMessage;
+                    try {
+                        readMessage = new String((byte[]) msg.obj, "UTF-8");
+                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+                        if (readMessage.equals("emergency"))
+                        {
+                            // Sends text and location information
+                            sendSMSEmergencyText();
+                            mMessageSender.run();
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (msg.what == CONNECTING_STATUS) {
+                    if (msg.arg1 == 1)
+                        //btStatus.setText("Connected to Device: " + (String) (msg.obj));
+                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
+                    else
+                        //btStatus.setText("Connection Failed");
+                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
 
         // Emergency Text
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
@@ -65,6 +109,16 @@ public class ParentActivity extends MenuActivity {
             }
         });
     }
+
+    private final Runnable mMessageSender = new Runnable() {
+        public void run() {
+            Message msg = btHandler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("alarm", alarmOn ? "On" : "Off");
+            msg.setData(bundle);
+            btHandler.sendMessage(msg);
+        }
+    };
 
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
@@ -87,8 +141,7 @@ public class ParentActivity extends MenuActivity {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                sendLocation();
-                String location = userAddress;
+                String location = sendLocation();
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
@@ -120,9 +173,9 @@ public class ParentActivity extends MenuActivity {
         }
     }
 
-    private void sendLocation() {
+    private String sendLocation() {
         if (ActivityCompat.checkSelfPermission(ParentActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return "";
         }
         client.getLastLocation().addOnSuccessListener(ParentActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -137,6 +190,7 @@ public class ParentActivity extends MenuActivity {
                 }
             }
         });
+        return userAddress;
     }
 
     private String getAddress(Context ctx, double lat, double lon) {

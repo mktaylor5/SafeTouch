@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
 
-public class BluetoothActivity extends AppCompatActivity {
+public abstract class BluetoothActivity extends AppCompatActivity {
     private BluetoothAdapter btAdapter = null;
     private Handler btHandler; // Our main handler that will receive callback notifications
     private BluetoothActivity.ConnectedThread btConnectedThread; // bluetooth background worker thread to send and receive data
@@ -48,33 +48,33 @@ public class BluetoothActivity extends AppCompatActivity {
 
         // Bluetooth
         establishBluetoothConnection();
-        btHandler = new Handler() {
-            public void handleMessage(android.os.Message msg) {
-                //Log.d(msg.obj.toString(), "msg");
-                if (msg.what == MESSAGE_READ) {
-                    String readMessage;
-                    try {
-                        readMessage = new String((byte[]) msg.obj, "UTF-8");
-                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-//                        if (readMessage != null)
-//                        {
+//        btHandler = new Handler() {
+//            public void handleMessage(android.os.Message msg) {
+//                //Log.d(msg.obj.toString(), "msg");
+//                if (msg.what == MESSAGE_READ) {
+//                    String readMessage;
+//                    try {
+//                        readMessage = new String((byte[]) msg.obj, "UTF-8");
+//                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+//                        //if (readMessage != null)
+//                        //{
 //                            // Sends text and location information
-//                            sendSMSEmergencyText();
-//                        }
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1)
-                        //btStatus.setText("Connected to Device: " + (String) (msg.obj));
-                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
-                    else
-                        //btStatus.setText("Connection Failed");
-                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
-                }
-            }
-        };
+//                            //super.sendSMSEmergencyText();
+//                        //}
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                if (msg.what == CONNECTING_STATUS) {
+//                    if (msg.arg1 == 1)
+//                        //btStatus.setText("Connected to Device: " + (String) (msg.obj));
+//                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
+//                    else
+//                        //btStatus.setText("Connection Failed");
+//                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        };
     }
 
 
@@ -119,7 +119,7 @@ public class BluetoothActivity extends AppCompatActivity {
                                 Toast.makeText(getBaseContext(), "Socket creation failed", Toast.LENGTH_SHORT).show();
                             }
                         }
-                        if (fail == false) {
+                        if (!fail) {
                             btConnectedThread = new ConnectedThread(btSocket);
                             btConnectedThread.start();
                             btHandler.obtainMessage(CONNECTING_STATUS, 1, -1, device.getName()).sendToTarget();

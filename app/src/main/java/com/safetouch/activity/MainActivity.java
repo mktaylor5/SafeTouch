@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Message;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -80,9 +81,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 //    private final static int REQUEST_ENABLE_BT = 1; // used to identify adding bluetooth names
       private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
       private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
-//
 
-    private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+    final boolean alarmOn = preferences.getBoolean("alarmOnOff", false);
+
+    //private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
     SmsManager smsManager = SmsManager.getDefault();
 
     @SuppressLint("HandlerLeak")
@@ -106,10 +109,16 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
                         //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                        if (readMessage == "emergency")
+                        if (readMessage.toLowerCase().equals("single"))
                         {
                             // Sends text and location information
                             sendSMSEmergencyText();
+                            mMessageSender.run();
+                        }
+                        else if (readMessage.toLowerCase().equals("double"))
+                        {
+                            // TODO: do something?
+                            Toast.makeText(getApplicationContext(), "Double tap detected", Toast.LENGTH_LONG).show();
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -125,15 +134,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
             }
         };
+
         //btConnectedThread.run();
-        // Location
+        // Location Client
         client = LocationServices.getFusedLocationProviderClient(this);
-//        sendLocation.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sendLocation();
-//            }
-//        });
 
         // Emergency Text
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
@@ -159,12 +163,21 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         ActivityCompat.requestPermissions(this, new String[]{ACCESS_FINE_LOCATION}, 1);
     }
 
+    private final Runnable mMessageSender = new Runnable() {
+        public void run() {
+            Message msg = btHandler.obtainMessage();
+            Bundle bundle = new Bundle();
+            bundle.putString("alarm", alarmOn ? "On" : "Off");
+            msg.setData(bundle);
+            btHandler.sendMessage(msg);
+        }
+    };
 
     //this sendLocation method should be called before getting the useraddress
 
-    private void sendLocation() {
+    private String sendLocation() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+            return "";
         }
         client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
             @Override
@@ -179,6 +192,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
             }
         });
+
+        return userAddress;
     }
 
     private String getAddress(Context ctx, double lat, double lon) {
@@ -315,8 +330,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                sendLocation();
-                String location = userAddress;
+                String location = sendLocation();
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
