@@ -45,8 +45,8 @@ public class ParentActivity extends MenuActivity {
     private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
     private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    final boolean alarmOn = preferences.getBoolean("alarmOnOff", false);
+    SharedPreferences preferences = null;
+    boolean alarmOn;
 
     private String userAddress;
     AppDatabase database;
@@ -57,6 +57,8 @@ public class ParentActivity extends MenuActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
         database = AppDatabase.getInstance(ParentActivity.this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        alarmOn = preferences.getBoolean("alarmOnOff", false);
 
         Button sendEmergencyText = (Button) findViewById(R.id.sendtext);
         Button sendFalseAlarm = (Button) findViewById(R.id.falsealarm);
@@ -142,6 +144,10 @@ public class ParentActivity extends MenuActivity {
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
                 String location = sendLocation();
+                if (location == null) {
+                    location = "No location found.";
+                }
+                Log.i("location", location);
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
@@ -149,7 +155,7 @@ public class ParentActivity extends MenuActivity {
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception ex) {
-            Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Send text: "+ex.getMessage(), Toast.LENGTH_LONG).show();
             ex.printStackTrace();
         }
     }

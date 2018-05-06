@@ -82,8 +82,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
       private final static int MESSAGE_READ = 2; // used in bluetooth handler to identify message update
       private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
-    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-    final boolean alarmOn = preferences.getBoolean("alarmOnOff", false);
+    SharedPreferences preferences = null;
+    boolean alarmOn;
 
     //private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
     SmsManager smsManager = SmsManager.getDefault();
@@ -95,6 +95,9 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
         requestLocationPermission();
         database = AppDatabase.getInstance(MainActivity.this);
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        alarmOn = preferences.getBoolean("alarmOnOff", false);
 
         Button sendEmergencyText = (Button) findViewById(R.id.send_text);
         Button escortMode = (Button) findViewById(R.id.escort_mode);
@@ -331,6 +334,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
                 String location = sendLocation();
+                if (location == null) {
+                    location = "No location found.";
+                }
+                Log.i("location", location);
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
