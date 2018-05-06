@@ -201,7 +201,6 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
     private String getAddress(Context ctx, double lat, double lon) {
         String address = "";
-
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
         try {
             List<Address> listAddresses = geocoder.getFromLocation(lat, lon, 1);
@@ -335,7 +334,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 // Loop through phoneNumbers array and send text to each one
                 String location = sendLocation();
                 if (location == null) {
-                    location = "No location found.";
+                    location = sendLocation();
+                    if (location == null) {
+                        location = "No location found.";
+                    }
                 }
                 Log.i("location", location);
                 for (Contact contact : contacts) {

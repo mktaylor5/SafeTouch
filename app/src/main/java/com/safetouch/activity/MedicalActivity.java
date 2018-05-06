@@ -146,7 +146,10 @@ public class MedicalActivity extends MenuActivity {
                 // Loop through phoneNumbers array and send text to each one
                 String location = sendLocation();
                 if (location == null) {
-                    location = "No location found.";
+                    location = sendLocation();
+                    if (location == null) {
+                        location = "No location found.";
+                    }
                 }
                 Log.i("location", location);
                 for (Contact contact : contacts) {
