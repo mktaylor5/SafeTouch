@@ -384,8 +384,9 @@ public class ConfigurationActivity extends MenuActivity {
                 Intent intent = new Intent(context, AlarmNotificationReceiver.class);
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
                 assert alarms != null;
+                // First notification happens in 10 sec for demo purposes
                 alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + (interval/6 * 60000),
+                        SystemClock.elapsedRealtime() + (60000/6),
                         pendingIntent);
 
                 //updateTime.add(Calendar.MINUTE, interval);

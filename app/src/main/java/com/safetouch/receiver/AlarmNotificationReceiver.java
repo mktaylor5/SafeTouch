@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.safetouch.R;
 import com.safetouch.activity.ConfigurationActivity;
+import com.safetouch.activity.MedicalActivity;
 import com.safetouch.domain.Configuration;
 
 public class AlarmNotificationReceiver extends BroadcastReceiver {
@@ -54,12 +55,15 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         MID++;
 
         AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int interval = 1;//Integer.parseInt(getDefaults("checkin_interval", context));
+        int interval = 1; //Integer.parseInt(getDefaults("checkin_interval", context));
         //int interval = 1;
         assert alarms != null;
         alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + (interval/6 * 60000),
+                SystemClock.elapsedRealtime() + (interval * 60000),
                 pendingIntent);
+
+        MedicalActivity medical = new MedicalActivity();
+        medical.checkInDone();
     }
 
     public static String getDefaults(String key, Context context) {//to get string from settings
