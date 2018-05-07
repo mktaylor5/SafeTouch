@@ -73,11 +73,16 @@ public class MedicalActivity extends MenuActivity {
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
                         //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                        if (readMessage.equals("emergency"))
+                        if (readMessage.toLowerCase().equals("single"))
                         {
                             // Sends text and location information
                             sendSMSEmergencyText();
                             mMessageSender.run();
+                        }
+                        else if (readMessage.toLowerCase().equals("double"))
+                        {
+                            // TODO: do something?
+                            Toast.makeText(getApplicationContext(), "Double tap detected", Toast.LENGTH_LONG).show();
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();

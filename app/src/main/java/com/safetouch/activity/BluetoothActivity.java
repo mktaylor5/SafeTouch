@@ -22,7 +22,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.UUID;
 
-public abstract class BluetoothActivity extends AppCompatActivity {
+public class BluetoothActivity extends AppCompatActivity {
     private BluetoothAdapter btAdapter = null;
     private Handler btHandler; // Our main handler that will receive callback notifications
     private BluetoothActivity.ConnectedThread btConnectedThread; // bluetooth background worker thread to send and receive data
