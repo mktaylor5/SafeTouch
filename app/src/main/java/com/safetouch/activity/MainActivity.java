@@ -68,8 +68,12 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
     //private Button sendLocation;
-    private String userAddress;
+    //private String userAddress;
     AppDatabase database;
+
+    public static String userAddress;
+    public Location loc;
+    LocationManager lm;
 
     private BluetoothAdapter btAdapter = null;
     private Handler btHandler; // Our main handler that will receive callback notifications
@@ -221,7 +225,17 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     //this sendLocation method should be called before getting the useraddress
 
     private String sendLocation() {
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+               if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                   return null;
+               }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+               double longitude = location.getLongitude();
+                double latitude = location.getLatitude() ;
+                userAddress = getAddress(getApplicationContext(),latitude,longitude);
+                return  userAddress;
+
+                   /*if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return "";
         }
         client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
@@ -235,8 +249,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     userAddress = getAddress(getApplicationContext(),ll.latitude,ll.longitude);
                     //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            }*/
+        //});
 //        Location test = client.getLastLocation().getResult();
 //        if (test != null) {
 //            double lat = test.getLatitude();
@@ -247,7 +261,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 //            //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
 //        }
 
-        return userAddress;
+       // return userAddress;
     }
 
     private String getAddress(Context ctx, double lat, double lon) {
@@ -383,7 +397,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                String location = "Computer Center, Lubbock, TX 79409, USA";//sendLocation();
+                String location = sendLocation();//"Computer Center, Lubbock, TX 79409, USA";//sendLocation();
                 if (location == null) {
                     location = sendLocation();
                     if (location == null) {
@@ -504,7 +518,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                         }
                     }if (event.getAction() == MotionEvent.ACTION_UP && escortPref == true && isRunning == false) {
                                 button.setText("Button UnPressed!");
-                                timer = new CountDownTimer(30000, 1000) {//30 seconds
+                                timer = new CountDownTimer(10000, 1000) {//30 seconds
                                 public void onTick(long millisUntilFinished) {
                                     isRunning = true;
                                 }

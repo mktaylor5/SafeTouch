@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
@@ -70,8 +71,11 @@ public class MedicalActivity extends MenuActivity {
 
     CountDownTimer checkin;
 
-    private String userAddress;
+    //private String userAddress;
     AppDatabase database = AppDatabase.getInstance(MedicalActivity.this);
+    public static String userAddress;
+    public Location loc;
+    LocationManager lm;
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -227,7 +231,7 @@ public class MedicalActivity extends MenuActivity {
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
                 Log.i("checkin", "in sms fn before sendLocation");
-                String location = "Computer Center, Lubbock, TX 79409, USA";//sendLocation();
+                String location = sendLocation();//"Computer Center, Lubbock, TX 79409, USA";//sendLocation();
                 if (location == null) {
                     location = sendLocation();
                     if (location == null) {
@@ -272,7 +276,17 @@ public class MedicalActivity extends MenuActivity {
     }
 
     private String sendLocation() {
-        if (ActivityCompat.checkSelfPermission(MedicalActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude() ;
+        userAddress = getAddress(getApplicationContext(),latitude,longitude);
+        return  userAddress;
+
+        /*if (ActivityCompat.checkSelfPermission(MedicalActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return "";
         }
         client.getLastLocation().addOnSuccessListener(MedicalActivity.this, new OnSuccessListener<Location>() {
@@ -288,7 +302,7 @@ public class MedicalActivity extends MenuActivity {
                 }
             }
         });
-        return userAddress;
+        return userAddress;*/
     }
 
     private String getAddress(Context ctx, double lat, double lon) {
@@ -316,7 +330,7 @@ public class MedicalActivity extends MenuActivity {
                 if (listAddresses.get(0).getCountryName() != null) {
                     address += listAddresses.get(0).getCountryName();
                 }
-                Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             e.printStackTrace();
