@@ -85,7 +85,11 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     private final static int CONNECTING_STATUS = 3; // used in bluetooth handler to identify message status
 
     SharedPreferences preferences = null;
-    boolean alarmOn;
+    boolean alarmOn, btConnected = false;
+
+    boolean isRunning = false;
+    CountDownTimer timer;
+
 
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
     SmsManager smsManager = SmsManager.getDefault();
@@ -100,12 +104,16 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         alarmOn = preferences.getBoolean("alarmOnOff", false);
+        final boolean escortPref = preferences.getBoolean("escort", false);
 
         Button sendEmergencyText = (Button) findViewById(R.id.send_text);
         Button escortMode = (Button) findViewById(R.id.escort_mode);
         Button sendFalseAlarm = (Button) findViewById(R.id.send_false_alarm);
 
         // Bluetooth
+        if(btConnected == false) {
+            establishBluetoothConnection();
+        }
         btHandler = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 //Log.d(msg.obj.toString(), "msg");
@@ -113,34 +121,66 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     String readMessage;
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
-                        //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                        if (readMessage.toLowerCase().equals("single"))
+                        Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
+                        if (readMessage.toLowerCase().contains("single"))
                         {
                             // Sends text and location information
                             sendSMSEmergencyText();
-                            mMessageSender.run();
+                            //mMessageSender.run();
+                            btConnectedThread.write(alarmOn ? "On" : "Off");
                         }
-                        else if (readMessage.toLowerCase().equals("double"))
+                        else if (readMessage.toLowerCase().contains("double"))
                         {
                             // TODO: do something?
                             Toast.makeText(getApplicationContext(), "Double tap detected", Toast.LENGTH_LONG).show();
+                        }
+
+                        if(escortPref == true){//in escort mode
+                            if(readMessage.contains("Hold")){
+                                if(isRunning == true){//stop timer if on
+                                    timer.cancel();
+                                    isRunning=false;
+                                }
+                            }else if(readMessage.contains("Released") && isRunning == false) {
+                                timer = new CountDownTimer(10000, 1000) {//30 seconds
+                                    public void onTick(long millisUntilFinished) {
+                                        isRunning = true;
+                                    }
+                                    public void onFinish() {
+                                        //Toast.makeText(getApplicationContext(), "timer done!", Toast.LENGTH_SHORT).show();
+                                        isRunning=false;
+                                        sendSMSEmergencyText();
+                                        finish();
+                                        startActivity(new Intent(MainActivity.this, MainActivity.class));
+                                        //startActivity(getIntent());
+                                    }
+
+                                }.start();
+                                pinDialog(timer);
+                            }
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
                 }
                 if (msg.what == CONNECTING_STATUS) {
-                    if (msg.arg1 == 1)
+                    if (msg.arg1 == 1) {
                         //btStatus.setText("Connected to Device: " + (String) (msg.obj));
-                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
-                    else
+                        Toast.makeText(getApplicationContext(), "Connected:" + (String) msg.obj, Toast.LENGTH_LONG).show();
+                        btConnected=true;
+                    }
+                    else {
                         //btStatus.setText("Connection Failed");
                         Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
+                        btConnected=false;
+                        establishBluetoothConnection();
+                    }
+
                 }
             }
         };
 
-        btConnectedThread.run();
+        //btConnectedThread.run();
         // Location Client
         client = LocationServices.getFusedLocationProviderClient(this);
 
@@ -427,15 +467,14 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if(verifyPin(numberInput.getText().toString()) == true) {
                     timer.cancel();//stop timer
                     finish();
-                    startActivity(getIntent());
+                    startActivity(new Intent(MainActivity.this, MainActivity.class));
                 }else{//wrong pin
                     numberInput.setError("Wrong PIN");
                 }
             }
         });
     }
-    boolean isRunning = false;
-    CountDownTimer timer;
+
     @SuppressLint("ClickableViewAccessibility")
     private void EscortMode() {
         final Button button = findViewById(R.id.escort_mode);
