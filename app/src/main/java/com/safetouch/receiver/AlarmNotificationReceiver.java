@@ -54,11 +54,11 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         MID++;
 
         AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int interval = Integer.parseInt(getDefaults("checkin_interval", context));
+        int interval = 1;//Integer.parseInt(getDefaults("checkin_interval", context));
         //int interval = 1;
         assert alarms != null;
         alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                SystemClock.elapsedRealtime() + (interval * 60000),
+                SystemClock.elapsedRealtime() + (interval/6 * 60000),
                 pendingIntent);
     }
 

@@ -385,7 +385,7 @@ public class ConfigurationActivity extends MenuActivity {
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, 0);
                 assert alarms != null;
                 alarms.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        SystemClock.elapsedRealtime() + (interval * 60000 * 1),
+                        SystemClock.elapsedRealtime() + (interval/6 * 60000),
                         pendingIntent);
 
                 //updateTime.add(Calendar.MINUTE, interval);
