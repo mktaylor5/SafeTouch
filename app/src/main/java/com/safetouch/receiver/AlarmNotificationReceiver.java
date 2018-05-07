@@ -63,7 +63,8 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 pendingIntent);
 
         MedicalActivity medical = new MedicalActivity();
-        medical.checkInDone();
+        medical.checkInDone(context);
+
     }
 
     public static String getDefaults(String key, Context context) {//to get string from settings

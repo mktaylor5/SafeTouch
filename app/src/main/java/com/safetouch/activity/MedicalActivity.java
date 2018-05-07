@@ -66,21 +66,24 @@ public class MedicalActivity extends MenuActivity {
 
     SharedPreferences preferences = null;
     boolean alarmOn, awaitingCheckIn = false, btConnected = false;
+    //String emergencyMessage = "";
 
     CountDownTimer checkin;
 
     private String userAddress;
-    AppDatabase database;
+    AppDatabase database = AppDatabase.getInstance(MedicalActivity.this);
 
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_medical);
-        database = AppDatabase.getInstance(MedicalActivity.this);
+        //database = AppDatabase.getInstance(MedicalActivity.this);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         alarmOn = preferences.getBoolean("alarmOnOff", false);
+        //emergencyMessage = preferences.getString("preset_msg","");
+
 
         Button sendEmergencyText = (Button) findViewById(R.id.sendtext);
         Button sendFalseAlarm = (Button) findViewById(R.id.falsealarm);
@@ -99,21 +102,28 @@ public class MedicalActivity extends MenuActivity {
                         Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
                         if (readMessage.toLowerCase().contains("single"))
                         {
-                            if (awaitingCheckIn) {
+                            Log.i("checkin", "awaiting var: " +String.valueOf(awaitingCheckIn));
+/*                            if (awaitingCheckIn) {
+                                Log.i("checkin","cancel");
                                 checkin.cancel();
                                 awaitingCheckIn = false;
                             }
-                            else {
+                            */
+                            //else {
                                 // Sends text and location information
                                 sendSMSEmergencyText();
                                 //mMessageSender.run();
                                 btConnectedThread.write(alarmOn ? "On" : "Off");
-                            }
+                           // }
                         }
                         else if (readMessage.toLowerCase().contains("double"))
                         {
                             // TODO: do something?
                             Toast.makeText(getApplicationContext(), "Double tap detected", Toast.LENGTH_LONG).show();
+                        }
+                        else if (readMessage.toLowerCase().contains("nosend"))
+                        {
+                            Toast.makeText(getApplicationContext(), "Checkin Recieved", Toast.LENGTH_LONG).show();
                         }
                     } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
@@ -127,7 +137,7 @@ public class MedicalActivity extends MenuActivity {
                     }
                     else {
                         //btStatus.setText("Connection Failed");
-                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
                         btConnected=false;
                         establishBluetoothConnection();
                     }
@@ -155,22 +165,31 @@ public class MedicalActivity extends MenuActivity {
         });
     }
 
-    public void checkInDone() {
+    public void checkInDone(final Context context) {
+        Log.i("checkin", "in checkin fn");
         awaitingCheckIn = true;
-        checkin = new CountDownTimer(5000, 1000) { // 5 second timer
+        checkin = new CountDownTimer(10000, 1000) { // 5 second timer
+
             @Override
             public void onTick(long l) {
-
+            awaitingCheckIn=true;
             }
 
             @Override
             public void onFinish() {
                 // check in time not met, send text
-                sendSMSEmergencyText();
+                Log.i("checkin", "send text");
+                //sendSMSEmergencyText();
+                Toast.makeText(context,"Checkin Failed",Toast.LENGTH_LONG).show();
+/*                Message msg = new Message();
+                msg.what = MESSAGE_READ;
+                msg.obj = "nosend";
+                btHandler.handleMessage(msg);*/
                 awaitingCheckIn = false;
                 //finish();
             }
         }.start();
+        Log.i("checkin", "timer created");
     }
 
     private final Runnable mMessageSender = new Runnable() {
@@ -193,33 +212,42 @@ public class MedicalActivity extends MenuActivity {
     }
 
     public void sendSMSEmergencyText() {
+        Log.i("checkin", "in sms fn before everything");
         List<Contact> contacts = database.getContactDao().getAll();
-        //String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
+        Log.i("checkin", "in sms fn after contacts");
+        //String emergencyMessage = database.SgetConfigurationDao().getEmergencyMessage();
         String emergencyMessage = "";
         try {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+/*            if (ContextCompat.checkSelfPermission(MedicalActivity.this, Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
+                Log.i("checkin", "in sms fn in if");
                 getPermissionToReadSMS();
-            } else {
-                emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
+            } else {*/
+                //emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                String location = sendLocation();
+                Log.i("checkin", "in sms fn before sendLocation");
+                String location = "Computer Center, Lubbock, TX 79409, USA";//sendLocation();
                 if (location == null) {
                     location = sendLocation();
                     if (location == null) {
                         location = "No location found.";
                     }
                 }
-                Log.i("location", location);
+                Log.i("checkin", "before emer msg");
+                emergencyMessage = preferences.getString("preset_msg","");
+                Log.i("checkin", "After emer Msg");
+                if(emergencyMessage == null)
+                    emergencyMessage = "NULL!!";
+
                 for (Contact contact : contacts) {
                     String message = "From SafeTouch: " + emergencyMessage + " Current Location: " + location;
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
-            }
+            //}
         } catch (Exception ex) {
-            Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), ex.getMessage(), Toast.LENGTH_LONG).show();
             ex.printStackTrace();
         }
     }
@@ -232,7 +260,7 @@ public class MedicalActivity extends MenuActivity {
                 getPermissionToReadSMS();
             } else {
                 for (Contact contact : contacts) {
-                    String message = "From SafeTouch: The last text was a result of a unintentional button press. Please ignore.";
+                    String message = "From SafeTouch: The last text was a result of an unintentional button press. Please ignore.";
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();

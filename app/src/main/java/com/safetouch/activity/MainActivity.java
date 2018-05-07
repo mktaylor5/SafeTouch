@@ -171,7 +171,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     }
                     else {
                         //btStatus.setText("Connection Failed");
-                        Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
                         btConnected=false;
                         establishBluetoothConnection();
                     }
@@ -237,6 +237,15 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 }
             }
         });
+//        Location test = client.getLastLocation().getResult();
+//        if (test != null) {
+//            double lat = test.getLatitude();
+//            double lon = test.getLongitude();
+//            LatLng ll = new LatLng(lat,lon);
+//            //Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
+//            userAddress = getAddress(getApplicationContext(),ll.latitude,ll.longitude);
+//            //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
+//        }
 
         return userAddress;
     }
@@ -265,7 +274,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if (listAddresses.get(0).getCountryName() != null) {
                     address += listAddresses.get(0).getCountryName();
                 }
-                Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -374,7 +383,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 emergencyMessage=getDefaults("preset_msg",getApplicationContext());//get msg from settings
                 // NOTE: any phone number can go here, the text will get sent to the emulator
                 // Loop through phoneNumbers array and send text to each one
-                String location = sendLocation();
+                String location = "Computer Center, Lubbock, TX 79409, USA";//sendLocation();
                 if (location == null) {
                     location = sendLocation();
                     if (location == null) {
@@ -402,7 +411,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 getPermissionToReadSMS();
             } else {
                 for (Contact contact : contacts) {
-                    String message = "From SafeTouch: The last text was a result of a unintentional button press. Please ignore.";
+                    String message = "From SafeTouch: The last text was a result of an unintentional button press. Please ignore.";
                     smsManager.sendTextMessage(contact.getPhoneNumber(), null, message, null, null);
                 }
                 Toast.makeText(this, contacts.size() != 1 ? "Messages sent!" : "Message sent!", Toast.LENGTH_SHORT).show();
