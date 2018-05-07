@@ -50,17 +50,17 @@ public class ConfigurationActivity extends MenuActivity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new PrefsFragment()).commit();
     }
-
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                this.finish();// go to parent activity.
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
+    
+@Override
+public boolean onOptionsItemSelected(MenuItem item) {//for back on actionbar
+    switch (item.getItemId()) {
+        case android.R.id.home:
+            this.finish();// go to parent activity.
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+    }
+}
 
     public static class PrefsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
         private Context mContext;

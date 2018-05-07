@@ -139,6 +139,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                             Toast.makeText(getApplicationContext(), "Double tap detected", Toast.LENGTH_LONG).show();
                         }
 
+                        if(readMessage.contains("Hold") && escortPref == false || readMessage.contains("Released") && escortPref == false){
+                            Toast.makeText(getApplicationContext(), "Turn escort mode on in settings", Toast.LENGTH_SHORT).show();
+                        }
+
                         if(escortPref == true){//in escort mode
                             if(readMessage.contains("Hold")){
                                 if(isRunning == true){//stop timer if on
@@ -146,7 +150,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                                     isRunning=false;
                                 }
                             }else if(readMessage.contains("Released") && isRunning == false) {
-                                timer = new CountDownTimer(10000, 1000) {//30 seconds
+                                timer = new CountDownTimer(10000, 1000) {//10 seconds
                                     public void onTick(long millisUntilFinished) {
                                         isRunning = true;
                                     }
@@ -156,7 +160,6 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                                         sendSMSEmergencyText();
                                         finish();
                                         startActivity(new Intent(MainActivity.this, MainActivity.class));
-                                        //startActivity(getIntent());
                                     }
 
                                 }.start();
