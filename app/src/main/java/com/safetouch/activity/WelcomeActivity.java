@@ -1,5 +1,6 @@
 package com.safetouch.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,7 +20,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 new TimerTask() {
                     @Override
                     public void run() {
-                        startActivity(new Intent(WelcomeActivity.this, MainActivity.class));
+                        startActivity(new Intent(WelcomeActivity.this, HomeActivity.class));
                     }
                 },
                 4000

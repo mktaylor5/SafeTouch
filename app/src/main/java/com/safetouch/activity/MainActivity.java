@@ -56,8 +56,10 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 public class MainActivity extends MenuActivity implements View.OnClickListener {
     private FusedLocationProviderClient client;
     private Button sendEmergencyText, escortMode;
+    LocationManager lm;
     //private Button sendLocation;
-    private String userAddress;
+    public static String userAddress;
+    public Location loc;
     AppDatabase database;
 
     private BluetoothAdapter btAdapter = null;
@@ -99,8 +101,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                     try {
                         readMessage = new String((byte[]) msg.obj, "UTF-8");
                         //Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-                        if (readMessage != null)
-                        {
+                        if (readMessage != null) {
                             // Sends text and location information
                             sendSMSEmergencyText();
                         }
@@ -111,22 +112,17 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if (msg.what == CONNECTING_STATUS) {
                     if (msg.arg1 == 1)
                         //btStatus.setText("Connected to Device: " + (String) (msg.obj));
-                        Toast.makeText(getApplicationContext(), "Connected:" + (String)msg.obj, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Connected:" + (String) msg.obj, Toast.LENGTH_LONG).show();
                     else
                         //btStatus.setText("Connection Failed");
                         Toast.makeText(getApplicationContext(), "Connection Failed", Toast.LENGTH_LONG).show();
                 }
             }
         };
-        //btConnectedThread.run();
+
         // Location
         client = LocationServices.getFusedLocationProviderClient(this);
-//        sendLocation.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                sendLocation();
-//            }
-//        });
+
 
         // Emergency Text
         sendEmergencyText.setOnClickListener(new View.OnClickListener() {
@@ -153,24 +149,25 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     //this sendLocation method should be called before getting the useraddress
 
     private String sendLocation() {
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
             return null;
         }
-        client.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    double lat = location.getLatitude();
-                    double lon = location.getLongitude();
-                    LatLng ll = new LatLng(lat,lon);
-                    //Toast.makeText(getApplicationContext(), "lat:" + lat + "lon:" + lon, Toast.LENGTH_SHORT).show();
-                    userAddress = getAddress(getApplicationContext(),ll.latitude,ll.longitude);
-                    //Toast.makeText(getApplicationContext(), userAddress, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        return userAddress;
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        double longitude = location.getLongitude();
+        double latitude = location.getLatitude() ;
+        userAddress = getAddress(getApplicationContext(),latitude,longitude);
+        return  userAddress;
+
+
+
+
     }
+
+
+
+
 
     private String getAddress(Context ctx, double lat, double lon) {
         String address = "";
@@ -197,7 +194,7 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
                 if (listAddresses.get(0).getCountryName() != null) {
                     address += listAddresses.get(0).getCountryName();
                 }
-                Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), address, Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -295,6 +292,10 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
     }
 
     public void sendSMSEmergencyText() {
+
+        String message1 = "From SafeTouch: " + " Current Location: " + sendLocation();
+        Toast.makeText(getApplicationContext(), message1, Toast.LENGTH_LONG).show();
+
         List<Contact> contacts = database.getContactDao().getAll();
         //String emergencyMessage = database.getConfigurationDao().getEmergencyMessage();
         String emergencyMessage = "";
@@ -325,8 +326,8 @@ public class MainActivity extends MenuActivity implements View.OnClickListener {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             //testing to see if the useraddress is null
-            sendLocation();
-            Toast.makeText(this, "Allow SMS send permissions\n"+userAddress, Toast.LENGTH_SHORT).show();
+            //sendLocation();
+            //Toast.makeText(this, "Allow SMS send permissions\n"+userAddress, Toast.LENGTH_SHORT).show();
         }
     }
 
